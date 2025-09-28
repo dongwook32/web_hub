@@ -61,7 +61,7 @@ def send_verification_email(to_email, token):
 @app.route('/')
 def main_page():
     nickname = session.get('nickname')
-    return render_template('main.html', nickname=nickname)
+    return render_template('index.html', nickname=nickname)
 
 @app.route('/login-page')
 def login_page():
