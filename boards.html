@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 - hub</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .boards-layout { display:grid; grid-template-columns: 260px 1fr; gap:16px; padding:24px 0; }
+        .panel { background:#fff; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.05); }
+        .panel-header { padding:14px 16px; border-bottom:1px solid #eee; font-weight:700; }
+        .panel-body { padding:16px; }
+        .board-menu { list-style:none; }
+        .board-menu li { padding:10px 12px; border-radius:10px; cursor:pointer; }
+        .board-menu li:hover { background:#FFF0E5; }
+        .post { padding:14px; border:1px solid #eee; border-radius:12px; margin-bottom:12px; background:#fff; }
+        .post-title { font-weight:700; margin-bottom:6px; }
+        .post-meta { color:#777; font-size:0.9rem; margin-bottom:8px; }
+        .actions { display:flex; gap:8px; }
+        .editor { margin-top:16px; display:none; }
+        .editor textarea { width:100%; padding:12px 14px; border:1px solid #eee; border-radius:10px; }
+        @media(max-width: 900px){ .boards-layout{ grid-template-columns:1fr; } }
+    </style>
+    <script>
+    function showEditor(){ document.getElementById('editor').style.display='block'; }
+    function hideEditor(){ document.getElementById('editor').style.display='none'; }
+    function submitPost(){ alert('글이 등록되었다고 가정합니다. (백엔드 필요)'); hideEditor(); }
+    </script>
+</head>
+<body>
+    <header id="main-header">
+        <nav class="container">
+            <div class="logo">
+                <a href="index.html"><img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#features">서비스 소개</a></li>
+                <li>
+                    <a href="chat.html">랜덤 매칭</a>
+                    <div class="dropdown-menu">
+                        <a href="chat.html#random">랜덤 1대1 매칭</a>
+                        <a href="chat.html#group">랜덤 그룹 매칭</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="boards.html">게시판</a>
+                    <div class="dropdown-menu">
+                        <a href="boards.html#ai">AI융합부</a>
+                        <a href="boards.html#bible">성서학과</a>
+                        <a href="boards.html#nursing">간호학과</a>
+                        <a href="boards.html#child">영유아보육학과</a>
+                        <a href="boards.html#social">사회복지학과</a>
+                    </div>
+                </li>
+                <li><a href="mypage.html">마이페이지</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="login.html" class="btn btn-secondary">로그인</a>
+                <a href="signup.html" class="btn btn-primary">회원가입</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="boards-layout">
+            <aside class="panel">
+                <div class="panel-header">컴퓨터소프트웨어학과</div>
+                <div class="panel-body">
+                    <ul class="board-menu">
+                        <li onclick="">학습 게시판</li>
+                        <li>선후배 게시판</li>
+                        <li>장터 게시판</li>
+                        <li>피드백 게시판</li>
+                    </ul>
+                </div>
+            </aside>
+            <section class="panel">
+                <div class="panel-header">게시글 목록</div>
+                <div class="panel-body">
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="showEditor()">글쓰기</button>
+                    </div>
+                    <div id="posts" style="margin-top:12px;">
+                        <article class="post">
+                            <div class="post-title">자료구조 스터디 모집합니다</div>
+                            <div class="post-meta">작성자: 스터디장 | 댓글 3 | 2025-09-25</div>
+                            <div class="post-content">이번 학기 자료구조 스터디원 3명 모집합니다.</div>
+                            <div class="actions" style="margin-top:8px;">
+                                <button class="btn btn-secondary">수정</button>
+                                <button class="btn btn-secondary">삭제</button>
+                            </div>
+                        </article>
+                        <article class="post">
+                            <div class="post-title">중고 노트북 팝니다</div>
+                            <div class="post-meta">작성자: 홍길동 | 댓글 5 | 2025-09-24</div>
+                            <div class="post-content">i5, 16GB, 512GB SSD, 상태 매우 좋습니다.</div>
+                            <div class="actions" style="margin-top:8px;">
+                                <button class="btn btn-secondary">수정</button>
+                                <button class="btn btn-secondary">삭제</button>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div id="editor" class="editor">
+                        <h3 style="margin-bottom:8px;">글쓰기</h3>
+                        <input type="text" placeholder="제목" style="width:100%; padding:12px 14px; border:1px solid #eee; border-radius:10px; margin-bottom:8px;" />
+                        <textarea rows="6" placeholder="내용" ></textarea>
+                        <div class="actions" style="margin-top:8px;">
+                            <button class="btn btn-primary" onclick="submitPost()">등록</button>
+                            <button class="btn btn-secondary" onclick="hideEditor()">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KBU Hub. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
