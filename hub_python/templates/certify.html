@@ -25,27 +25,25 @@
         sendBtn.addEventListener('click', function() {
             const email = emailInput.value; // 입력창에 적힌 이메일 값 가져오기
 
-            // 백엔드 서버 API에 이메일 데이터를 보내는 부분 (가장 중요!)
-            fetch('http://127.0.0.1:5000/send-verification', {
-                method: 'POST', // Postman에서 했던 것과 같이 POST 방식으로
+            // [매우 중요!] 백엔드 서버 API 주소를 동적으로 변경하도록 수정
+            fetch("{{ url_for('start_verification') }}", {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // JSON 형태로 데이터를 보낸다고 알려주기
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email: email }) // JavaScript 객체를 JSON 문자열로 변환하여 전송
+                body: JSON.stringify({ email: email })
             })
-            .then(response => response.json()) // 서버로부터 받은 응답을 JSON 형태로 파싱
+            .then(response => response.json())
             .then(data => {
-                // 최종적으로 받은 데이터(data)로 화면에 메시지 표시
                 if (data.message) {
-                    resultMessage.textContent = data.message; // 성공 메시지
+                    resultMessage.textContent = data.message;
                     resultMessage.style.color = 'blue';
                 } else {
-                    resultMessage.textContent = '오류: ' + data.error; // 실패 메시지
+                    resultMessage.textContent = '오류: ' + data.error;
                     resultMessage.style.color = 'red';
                 }
             })
             .catch(error => {
-                // 네트워크 오류 등으로 서버와 통신 자체가 실패했을 때
                 console.error('Error:', error);
                 resultMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
                 resultMessage.style.color = 'red';

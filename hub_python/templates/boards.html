@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시판 - hub</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- [수정됨] CSS 파일 경로 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .boards-layout { display:grid; grid-template-columns: 260px 1fr; gap:16px; padding:24px 0; }
         .panel { background:#fff; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.05); }
@@ -31,37 +32,41 @@
     <header id="main-header">
         <nav class="container">
             <div class="logo">
-                <a href="index.html"><img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
+                <!-- [수정됨] 로고 이미지와 메인 페이지 링크 경로 -->
+                <a href="{{ url_for('main_page') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html#features">서비스 소개</a></li>
+                <!-- [수정됨] 아직 기능이 없는 페이지는 #으로 임시 처리 -->
+                <li><a href="{{ url_for('main_page') }}#features">서비스 소개</a></li>
                 <li>
-                    <a href="chat.html">랜덤 매칭</a>
+                    <a href="#">랜덤 매칭</a>
                     <div class="dropdown-menu">
-                        <a href="chat.html#random">랜덤 1대1 매칭</a>
-                        <a href="chat.html#group">랜덤 그룹 매칭</a>
+                        <a href="#">랜덤 1대1 매칭</a>
+                        <a href="#">랜덤 그룹 매칭</a>
                     </div>
                 </li>
                 <li>
-                    <a href="boards.html">게시판</a>
+                    <a href="#">게시판</a>
                     <div class="dropdown-menu">
-                        <a href="boards.html#ai">AI융합부</a>
-                        <a href="boards.html#bible">성서학과</a>
-                        <a href="boards.html#nursing">간호학과</a>
-                        <a href="boards.html#child">영유아보육학과</a>
-                        <a href="boards.html#social">사회복지학과</a>
+                        <a href="#">AI융합부</a>
+                        <a href="#">성서학과</a>
+                        <a href="#">간호학과</a>
+                        <a href="#">영유아보육학과</a>
+                        <a href="#">사회복지학과</a>
                     </div>
                 </li>
-                <li><a href="mypage.html">마이페이지</a></li>
+                <li><a href="#">마이페이지</a></li>
             </ul>
             <div class="auth-buttons">
-                <a href="login.html" class="btn btn-secondary">로그인</a>
-                <a href="signup.html" class="btn btn-primary">회원가입</a>
+                <!-- [수정됨] 로그인/회원가입 페이지 링크 경로 -->
+                <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
+                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
             </div>
         </nav>
     </header>
 
     <main class="container">
+        <!-- 이하 내용은 변경사항 없음 -->
         <div class="boards-layout">
             <aside class="panel">
                 <div class="panel-header">컴퓨터소프트웨어학과</div>
@@ -121,8 +126,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- [수정됨] JavaScript 파일 경로 -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-

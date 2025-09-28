@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hub - 우리들의 새로운 이야기</title>
     
-    <link rel="stylesheet" href="style.css">
+    <!-- [수정됨] 로컬 CSS 파일 경로 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
+    <!-- 외부 CDN 링크는 그대로 둡니다 -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 </head>
 <body>
@@ -16,32 +17,37 @@
     <header id="main-header">
         <nav class="container">
         <div class="logo">
-            <img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;">
+            <!-- [수정됨] 로고 이미지 경로 -->
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;">
         </div>
             <ul class="nav-links">
-                <li><a href="#features">서비스 소개</a></li>
-       
-                <il></il><a href="chat.html">랜덤 매칭</a>
+                <!-- [수정됨] 페이지 내부 링크 -->
+                <li><a href="{{ url_for('main_page') }}#features">서비스 소개</a></li>
+    
+                <!-- [수정됨] 페이지 이동 링크 -->
+                <li><a href="{{ url_for('chat_page') }}">랜덤 매칭</a>
                     <div class="dropdown-menu">
-                        <a href="chat.html#random">랜덤 1대1 매칭</a>
-                        <a href="chat.html#group">랜덤 그룹 매칭</a>
+                        <a href="{{ url_for('chat_page') }}#random">랜덤 1대1 매칭</a>
+                        <a href="{{ url_for('chat_page') }}#group">랜덤 그룹 매칭</a>
                     </div>
                 </li>
                 <li>
-                    <a href="boards.html">게시판</a>
+                    <!-- [수정됨] 아직 기능이 없는 페이지는 #으로 임시 처리 -->
+                    <a href="#">게시판</a>
                     <div class="dropdown-menu">
-                        <a href="boards.html#ai">AI융합부</a>
-                        <a href="boards.html#bible">성서학과</a>
-                        <a href="boards.html#nursing">간호학과</a>
-                        <a href="boards.html#child">영유아보육학과</a>
-                        <a href="boards.html#social">사회복지학과</a>
+                        <a href="#">AI융합부</a>
+                        <a href="#">성서학과</a>
+                        <a href="#">간호학과</a>
+                        <a href="#">영유아보육학과</a>
+                        <a href="#">사회복지학과</a>
                     </div>
                 </li>
-                <li><a href="mypage.html">마이페이지</a></li>
+                <li><a href="#">마이페이지</a></li>
             </ul>
             <div class="auth-buttons">
-                <a href="login.html" class="btn btn-secondary">로그인</a>
-                <a href="signup.html" class="btn btn-primary">회원가입</a>
+                <!-- [수정됨] 로그인/회원가입 페이지 이동 링크 -->
+                <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
+                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
             </div>
         </nav>
     </header>
@@ -51,7 +57,8 @@
             <div class="container" data-aos="fade-up">
                 <h1>일상의 캠퍼스, <br>특별한 우리들의 이야기</h1>
                 <p>익숙했던 공간에서 펼쳐지는 새로운 만남, 지금 바로 시작해보세요.</p>
-                <a href="signup.html" class="btn btn-primary btn-large">지금 시작하기</a>
+                <!-- [수정됨] 회원가입 페이지 이동 링크 -->
+                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary btn-large">지금 시작하기</a>
             </div>
         </section>
 
@@ -93,7 +100,8 @@
         <section id="cta">
             <div class="container" data-aos="fade-up">
                 <h2>망설이지 마세요. <br>당신의 캠퍼스 라이프가 더 즐거워질 거예요.</h2>
-                <a href="#" class="btn btn-primary btn-large">시작하기</a>
+                 <!-- [수정됨] 회원가입 페이지 이동 링크 -->
+                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary btn-large">시작하기</a>
             </div>
         </section>
     </main>
@@ -104,7 +112,9 @@
         </div>
     </footer>
 
+    <!-- 외부 CDN 링크는 그대로 둡니다 -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script.js"></script>
+    <!-- [수정됨] 로컬 JavaScript 파일 경로 -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
