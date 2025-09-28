@@ -8,11 +8,10 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import timedelta
 
-# --- 초기 설정 ---
+# --- Initial Setup ---
 app = Flask(__name__)
 CORS(app)
 
-# [수정됨] config.py를 읽는 대신, Render에 설정한 환경 변수를 직접 읽어옵니다.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
 app.secret_key = os.environ.get('SECRET_KEY')
@@ -22,8 +21,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# --- 이하 코드는 기존과 동일합니다 ---
-# (데이터베이스 모델, 이메일 발송 함수, 라우트 등은 그대로 유지)
+# --- Database Models ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -36,27 +34,28 @@ class EmailVerification(db.Model):
     email = db.Column(db.String(100), nullable=False)
     token = db.Column(db.String(100), unique=True, nullable=False)
 
+# --- Email Sending Function ---
 def send_verification_email(to_email, token):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = app.config['SENDINBLUE_API_KEY']
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     
-    subject = "[내 사이트] 이메일 인증을 완료해주세요."
-    # [수정됨] 이제 실제 Render 웹사이트 주소를 사용합니다!
-    verification_link = f"https://kbu-hub.onrender.com/verify/{token}" 
+    subject = "[KBU Hub] 이메일 인증을 완료해주세요."
+    verification_link = f"https://kbuhub.onrender.com/verify/{token}"
     html_content = f"가입을 완료하려면 링크를 클릭하세요: <a href='{verification_link}'>인증하기</a>"
-    sender = {"name": "내 사이트 관리자", "email": "dongwook219@gmail.com"}
+    sender = {"name": "KBU Hub 관리자", "email": "dongwook219@gmail.com"}
     to = [{"email": to_email}]
     
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, html_content=html_content, sender=sender, subject=subject)
 
     try:
-        api_response = api_instance.send_transac_email(send_smtp_email)
-        print(api_response)
+        api_instance.send_transac_email(send_smtp_email)
         return True
     except ApiException as e:
-        print(f"Exception when calling TransactionalEmailsApi->send_transac_email: {e}\n")
+        print(f"Exception: {e}\n")
         return False
+
+# --- Routes (Pages and API) ---
 
 @app.route('/')
 def main_page():
@@ -79,11 +78,34 @@ def show_signup_form(token):
     else:
         return "유효하지 않거나 만료된 인증 링크입니다.", 404
 
+# --- [ADDED] Placeholder Page Routes ---
+@app.route('/chat')
+def chat_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    nickname = session.get('nickname')
+    return render_template('chat.html', nickname=nickname)
+
+@app.route('/boards')
+def boards_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    nickname = session.get('nickname')
+    return render_template('boards.html', nickname=nickname)
+
+@app.route('/mypage')
+def mypage_page():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    nickname = session.get('nickname')
+    return render_template('mypage.html', nickname=nickname)
+# ------------------------------------
+
 @app.route('/send-verification', methods=['POST'])
 def start_verification():
     email = request.json['email']
     if not email.endswith('@bible.ac.kr'):
-        return jsonify({"error": "학교 이메일만 사용할 수 있습니다."}), 400
+        return jsonify({"error": "성서대학교 이메일만 사용할 수 있습니다."}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "이미 가입된 이메일입니다."}), 409
         
@@ -100,16 +122,19 @@ def start_verification():
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
-    token = data['token']
+    token = data.get('token')
     
     verification_data = EmailVerification.query.filter_by(token=token).first()
     if not verification_data:
         return jsonify({"error": "유효하지 않은 토큰입니다."}), 400
 
     email = verification_data.email
-    student_id = data['student_id']
-    password = data['password']
-    nickname = data['nickname']
+    student_id = data.get('student_id')
+    password = data.get('password')
+    nickname = data.get('nickname')
+
+    if not all([student_id, password, nickname]):
+        return jsonify({"error": "모든 필드를 입력해주세요."}), 400
 
     if User.query.filter_by(student_id=student_id).first() or \
        User.query.filter_by(nickname=nickname).first():
@@ -132,8 +157,8 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    student_id = data['student_id']
-    password = data['password']
+    student_id = data.get('student_id')
+    password = data.get('password')
 
     user = User.query.filter_by(student_id=student_id).first()
 
@@ -150,6 +175,7 @@ def logout():
     session.clear()
     return redirect(url_for('main_page'))
 
+# This block is not executed in production on Render
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
