@@ -1,21 +1,29 @@
-# app.py
-from flask import Flask, request, jsonify, render_template, redirect 
+import os
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 import uuid
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
+from datetime import timedelta
 
 # --- 초기 설정 ---
 app = Flask(__name__)
 CORS(app)
-app.config.from_pyfile('config.py')  # 설정 파일 불러오기
+
+# [수정됨] config.py를 읽는 대신, Render에 설정한 환경 변수를 직접 읽어옵니다.
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
+app.secret_key = os.environ.get('SECRET_KEY')
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# --- 데이터베이스 모델 정의 ---
+# --- 이하 코드는 기존과 동일합니다 ---
+# (데이터베이스 모델, 이메일 발송 함수, 라우트 등은 그대로 유지)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -28,16 +36,16 @@ class EmailVerification(db.Model):
     email = db.Column(db.String(100), nullable=False)
     token = db.Column(db.String(100), unique=True, nullable=False)
 
-# --- Brevo(Sendinblue) 이메일 발송 함수 ---
 def send_verification_email(to_email, token):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = app.config['SENDINBLUE_API_KEY']
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     
     subject = "[내 사이트] 이메일 인증을 완료해주세요."
-    verification_link = f"http://127.0.0.1:5000/verify/{token}"
+    # [수정됨] 이제 실제 Render 웹사이트 주소를 사용합니다!
+    verification_link = f"https://kbu-hub.onrender.com/verify/{token}" 
     html_content = f"가입을 완료하려면 링크를 클릭하세요: <a href='{verification_link}'>인증하기</a>"
-    sender = {"name": "내 사이트 관리자", "email": "dongwook219@gmail.com"} # Brevo에 등록된 발신자
+    sender = {"name": "내 사이트 관리자", "email": "dongwook219@gmail.com"}
     to = [{"email": to_email}]
     
     send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, html_content=html_content, sender=sender, subject=subject)
@@ -47,17 +55,35 @@ def send_verification_email(to_email, token):
         print(api_response)
         return True
     except ApiException as e:
-        print("Exception when calling TransactionalEmailsApi->send_transac_email: %s\n" % e)
+        print(f"Exception when calling TransactionalEmailsApi->send_transac_email: {e}\n")
         return False
 
-# --- API 엔드포인트 ---
+@app.route('/')
+def main_page():
+    nickname = session.get('nickname')
+    return render_template('main.html', nickname=nickname)
+
+@app.route('/login-page')
+def login_page():
+    return render_template('login.html')
+
+@app.route('/signup-page')
+def signup_email_page():
+    return render_template('signup_email.html')
+
+@app.route('/verify/<token>')
+def show_signup_form(token):
+    verification_data = EmailVerification.query.filter_by(token=token).first()
+    if verification_data:
+        return render_template('signup_form.html', user_email=verification_data.email, token=token)
+    else:
+        return "유효하지 않거나 만료된 인증 링크입니다.", 404
+
 @app.route('/send-verification', methods=['POST'])
 def start_verification():
     email = request.json['email']
-    
     if not email.endswith('@bible.ac.kr'):
         return jsonify({"error": "학교 이메일만 사용할 수 있습니다."}), 400
-    
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "이미 가입된 이메일입니다."}), 409
         
@@ -70,21 +96,6 @@ def start_verification():
         return jsonify({"message": "인증 이메일이 발송되었습니다."})
     else:
         return jsonify({"error": "이메일 발송에 실패했습니다."}), 500
-
-# --- 이 부분이 수정/추가되었습니다 ---
-@app.route('/verify/<token>')
-def show_signup_form(token):
-    # DB에서 토큰 정보 찾기
-    verification_data = EmailVerification.query.filter_by(token=token).first()
-    
-    if verification_data:
-        # 토큰이 유효하면, signup.html 파일을 렌더링(표시)해준다.
-        # 이메일 주소와 토큰 값을 HTML 페이지로 전달하여 사용한다.
-        return render_template('signup.html', user_email=verification_data.email, token=token)
-    else:
-        # 토큰이 유효하지 않으면 에러 메시지를 보여준다.
-        return "유효하지 않거나 만료된 인증 링크입니다.", 404
-# --- 여기까지 수정/추가 ---
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -113,13 +124,33 @@ def signup():
         nickname=nickname
     )
     db.session.add(new_user)
-    db.session.delete(verification_data) # 인증 완료 후 임시 토큰 삭제
+    db.session.delete(verification_data)
     db.session.commit()
     
-    return jsonify({"message": "회원가입이 완료되었습니다!"}), 201
+    return jsonify({"message": "회원가입이 완료되었습니다! 로그인 페이지로 이동합니다."}), 201
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    student_id = data['student_id']
+    password = data['password']
+
+    user = User.query.filter_by(student_id=student_id).first()
+
+    if user and bcrypt.check_password_hash(user.password_hash, password):
+        session.permanent = True
+        session['user_id'] = user.id
+        session['nickname'] = user.nickname
+        return jsonify({"message": "로그인 성공!"}), 200
+    else:
+        return jsonify({"error": "학번 또는 비밀번호가 일치하지 않습니다."}), 401
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('main_page'))
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # 앱 실행 시 DB와 테이블 자동 생성
+        db.create_all()
     app.run(debug=True)
