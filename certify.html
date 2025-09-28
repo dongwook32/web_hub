@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>학생 이메일 인증</title>
+</head>
+<body>
+
+    <h1>학교 이메일로 인증하기</h1>
+    <p>학교 이메일(@...ac.kr)을 입력하고 인증 버튼을 눌러주세요.</p>
+
+    <input type="email" id="email-input" placeholder="학교 이메일을 입력하세요">
+
+    <button id="send-btn">인증 메일 요청</button>
+
+    <p id="result-message"></p>
+
+    <script>
+        // HTML 요소들을 JavaScript 변수에 담기
+        const emailInput = document.getElementById('email-input');
+        const sendBtn = document.getElementById('send-btn');
+        const resultMessage = document.getElementById('result-message');
+
+        // '인증 메일 요청' 버튼을 클릭했을 때 실행할 함수 설정
+        sendBtn.addEventListener('click', function() {
+            const email = emailInput.value; // 입력창에 적힌 이메일 값 가져오기
+
+            // 백엔드 서버 API에 이메일 데이터를 보내는 부분 (가장 중요!)
+            fetch('http://127.0.0.1:5000/send-verification', {
+                method: 'POST', // Postman에서 했던 것과 같이 POST 방식으로
+                headers: {
+                    'Content-Type': 'application/json', // JSON 형태로 데이터를 보낸다고 알려주기
+                },
+                body: JSON.stringify({ email: email }) // JavaScript 객체를 JSON 문자열로 변환하여 전송
+            })
+            .then(response => response.json()) // 서버로부터 받은 응답을 JSON 형태로 파싱
+            .then(data => {
+                // 최종적으로 받은 데이터(data)로 화면에 메시지 표시
+                if (data.message) {
+                    resultMessage.textContent = data.message; // 성공 메시지
+                    resultMessage.style.color = 'blue';
+                } else {
+                    resultMessage.textContent = '오류: ' + data.error; // 실패 메시지
+                    resultMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                // 네트워크 오류 등으로 서버와 통신 자체가 실패했을 때
+                console.error('Error:', error);
+                resultMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
+                resultMessage.style.color = 'red';
+            });
+        });
+    </script>
+</body>
+</html>

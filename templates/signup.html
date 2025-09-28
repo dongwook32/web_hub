@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+    <h1>회원가입</h1>
+    <!-- Flask에서 전달받은 이메일 주소를 표시합니다. -->
+    <p><strong>{{ user_email }}</strong> 계정으로 가입을 진행합니다.</p>
+
+    <!-- Flask에서 전달받은 토큰 값을 숨겨진 필드에 저장합니다. -->
+    <input type="hidden" id="verification-token" value="{{ token }}">
+
+    <!-- 학번 입력 -->
+    <label for="student-id">학번:</label><br>
+    <input type="text" id="student-id" placeholder="학번을 입력하세요"><br><br>
+
+    <!-- 닉네임 입력 -->
+    <label for="nickname">닉네임:</label><br>
+    <input type="text" id="nickname" placeholder="사이트에서 사용할 닉네임"><br><br>
+
+    <!-- 비밀번호 입력 -->
+    <label for="password">비밀번호:</label><br>
+    <input type="password" id="password" placeholder="비밀번호"><br><br>
+
+    <!-- 서버로부터 받은 결과를 표시할 공간 -->
+    <p id="result-message"></p>
+
+    <button id="signup-btn">가입 완료</button>
+
+    <script>
+        // 버튼과 입력 필드 요소 가져오기
+        const signupBtn = document.getElementById('signup-btn');
+        const studentIdInput = document.getElementById('student-id');
+        const nicknameInput = document.getElementById('nickname');
+        const passwordInput = document.getElementById('password');
+        const tokenInput = document.getElementById('verification-token'); // 숨겨진 토큰 필드
+        const resultMessage = document.getElementById('result-message');
+
+        // 가입 완료 버튼 클릭 이벤트 처리
+        signupBtn.addEventListener('click', function() {
+            // 사용자가 입력한 값들
+            const studentId = studentIdInput.value;
+            const nickname = nicknameInput.value;
+            const password = passwordInput.value;
+            const token = tokenInput.value; // 숨겨진 필드에서 토큰 값 가져오기
+
+            // 백엔드의 /signup API로 데이터 전송
+            fetch('http://127.0.0.1:5000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    nickname: nickname,
+                    password: password,
+                    token: token // 인증 성공을 증명하는 토큰
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    resultMessage.textContent = data.message;
+                    resultMessage.style.color = 'blue';
+                    // 성공 시 버튼 비활성화
+                    signupBtn.disabled = true;
+                } else {
+                    resultMessage.textContent = '오류: ' + data.error;
+                    resultMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultMessage.textContent = '서버 통신 오류가 발생했습니다.';
+            });
+        });
+    </script>
+</body>
+</html>
