@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hub - 우리들의 새로운 이야기</title>
+    
+    <link rel="stylesheet" href="style.css?v=1.1">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+<body>
+
+    <header id="main-header">
+        <nav class="container">
+        <div class="logo">
+            <img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;">
+        </div>
+            <ul class="nav-links">
+                <li><a href="#features">서비스 소개</a></li>
+                <li>
+                    <a href="chat.html">랜덤 매칭</a>
+                    <div class="dropdown-menu">
+                        <a href="chat.html#random">랜덤 1대1 매칭</a>
+                        <a href="chat.html#group">랜덤 그룹 매칭</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="boards.html">게시판</a>
+                    <div class="dropdown-menu">
+                        <a href="boards.html#ai">AI융합부</a>
+                        <a href="boards.html#bible">성서학과</a>
+                        <a href="boards.html#nursing">간호학과</a>
+                        <a href="boards.html#child">영유아보육학과</a>
+                        <a href="boards.html#social">사회복지학과</a>
+                    </div>
+                </li>
+                <li><a href="mypage.html">마이페이지</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="login.html" class="btn btn-secondary">로그인</a>
+                <a href="signup.html" class="btn btn-primary">회원가입</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container" data-aos="fade-up">
+                <h1>일상의 캠퍼스, <br>특별한 우리들의 이야기</h1>
+                <p>익숙했던 공간에서 펼쳐지는 새로운 만남, 지금 바로 시작해보세요.</p>
+                <a href="signup.html" class="btn btn-primary btn-large">지금 시작하기</a>
+            </div>
+        </section>
+
+        <section id="features" class="container">
+            <h2 data-aos="fade-up">세대를 잇는 소통의 장</h2>
+        
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon">🎭</div>
+                    <h3>부담 없는 익명 프로필</h3>
+                    <p>나를 표현하는 키워드와 관심사로 개성있는 프로필을 만들어 보세요.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon">✨</div>
+                    <h3>관심사 기반 매칭</h3>
+                    <p>같은 수업, 취미, 관심사를 가진 친구와 자연스럽게 연결될 수 있어요.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon">🤝</div>
+                    <h3>세대를 잇는 소통의 장</h3>
+                    <p>선배의 경험과 후배의 열정을 이어주며<br>따뜻한 연결을 만드는 학과 게시판입니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="departments" class="container">
+            <h2 data-aos="fade-up">우리는 여기서 당신을 기다려요</h2>
+            <div class="department-list" data-aos="fade-up" data-aos-delay="100">
+                <span class="department-tag">간호학과</span>
+                <span class="department-tag">성서학과</span>
+                <span class="department-tag">사회복지학과</span>
+                <span class="department-tag">영유아보육학과</span>
+                <span class="department-tag">AI융합학부</span>
+            </div>
+        </section>
+
+
+        
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 KBU Hub. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
