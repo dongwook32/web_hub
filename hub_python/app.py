@@ -8,10 +8,11 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import timedelta
 
-# --- Initial Setup ---
+# --- 초기 설정 ---
 app = Flask(__name__)
 CORS(app)
 
+# Render의 환경 변수를 사용합니다.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
 app.secret_key = os.environ.get('SECRET_KEY')
@@ -21,7 +22,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# --- Database Models ---
+# --- 데이터베이스 모델 정의 ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -34,7 +35,7 @@ class EmailVerification(db.Model):
     email = db.Column(db.String(100), nullable=False)
     token = db.Column(db.String(100), unique=True, nullable=False)
 
-# --- Email Sending Function ---
+# --- 이메일 발송 함수 ---
 def send_verification_email(to_email, token):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = app.config['SENDINBLUE_API_KEY']
@@ -55,7 +56,7 @@ def send_verification_email(to_email, token):
         print(f"Exception: {e}\n")
         return False
 
-# --- Routes (Pages and API) ---
+# --- 라우트 (페이지 및 API) 정의 ---
 
 @app.route('/')
 def main_page():
@@ -78,7 +79,7 @@ def show_signup_form(token):
     else:
         return "유효하지 않거나 만료된 인증 링크입니다.", 404
 
-# --- [ADDED] Placeholder Page Routes ---
+# --- [추가됨] 모든 페이지 라우트 ---
 @app.route('/chat')
 def chat_page():
     if 'user_id' not in session:
@@ -176,7 +177,9 @@ def logout():
     return redirect(url_for('main_page'))
 
 # This block is not executed in production on Render
+# It's only for running the app on your local computer
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
