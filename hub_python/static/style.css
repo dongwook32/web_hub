@@ -1,4 +1,4 @@
-/* 기본 스타일 및 변수 설정 */
+/* 기본 스타일 및 변수 설정 - v1.1 */
 :root {
     --primary-color: #FF7B54; /* 따뜻한 주황색 */
     --secondary-color: #FFB26B;
@@ -97,6 +97,7 @@ body {
 
 .nav-links li {
     margin: 0 20px;
+    position: relative;
 }
 
 .nav-links a {
@@ -105,6 +106,8 @@ body {
     font-size: 1.3rem;
     font-weight: 600;
     transition: color 0.3s ease;
+    display: block;
+    padding: 8px 0;
 }
 
 .nav-links a:hover {
@@ -291,5 +294,84 @@ footer {
 .segmented .btn { background:#f5f5f5; }
 .segmented .btn.active { background: var(--primary-color); color:#fff; }
 .helper { font-size:0.85rem; color:#777; margin-top:6px; }
+
+/* 댓글 스타일 */
+.comment {
+    transition: all 0.3s ease;
+    border-left: 3px solid var(--primary-color);
+}
+
+.comment:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+.comment-author {
+    font-size: 0.9rem;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+}
+
+.comment-content {
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.comment-actions .btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+}
+
+.comment-form {
+    border: 2px dashed #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.comment-form:focus-within {
+    border-color: var(--primary-color);
+}
+
+.comment-form textarea {
+    border: 1px solid #ddd;
+    transition: border-color 0.3s ease;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 123, 84, 0.2);
+}
+
+.post-detail h2 {
+    color: var(--heading-color);
+    margin-bottom: 8px;
+}
+
+.post-detail h3 {
+    color: var(--heading-color);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.post-detail h4 {
+    color: var(--heading-color);
+    margin-bottom: 12px;
+}
+
+.back-button .btn {
+    background: #f8f9fa;
+    color: var(--text-color);
+    border: 1px solid #ddd;
+}
+
+.back-button .btn:hover {
+    background: #e9ecef;
+    transform: translateX(-2px);
+}
+
+
 
 
