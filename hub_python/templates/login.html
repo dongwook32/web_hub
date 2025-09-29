@@ -4,42 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 - hub</title>
-    <!-- [수정됨] CSS 파일 경로 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="style.css?v=1.1">
 </head>
 <body>
     <header id="main-header">
         <nav class="container">
             <div class="logo">
-                <!-- [수정됨] 로고 이미지와 메인 페이지 링크 경로 -->
-                <a href="{{ url_for('main_page') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
+                <a href="index.html"><img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
             </div>
             <ul class="nav-links">
-                <!-- [수정됨] 페이지 링크 경로 -->
-                <li><a href="{{ url_for('main_page') }}#features">서비스 소개</a></li>
+                <li><a href="index.html#features">서비스 소개</a></li>
                 <li>
-                    <a href="#">랜덤 매칭</a>
+                    <a href="chat.html">랜덤 매칭</a>
                     <div class="dropdown-menu">
-                        <a href="#">랜덤 1대1 매칭</a>
-                        <a href="#">랜덤 그룹 매칭</a>
+                        <a href="chat.html#random">랜덤 1대1 매칭</a>
+                        <a href="chat.html#group">랜덤 그룹 매칭</a>
                     </div>
                 </li>
                 <li>
-                    <a href="#">게시판</a>
+                    <a href="boards.html">게시판</a>
                     <div class="dropdown-menu">
-                        <a href="#">AI융합부</a>
-                        <a href="#">성서학과</a>
-                        <a href="#">간호학과</a>
-                        <a href="#">영유아보육학과</a>
-                        <a href="#">사회복지학과</a>
+                        <a href="boards.html#ai">AI융합부</a>
+                        <a href="boards.html#bible">성서학과</a>
+                        <a href="boards.html#nursing">간호학과</a>
+                        <a href="boards.html#child">영유아보육학과</a>
+                        <a href="boards.html#social">사회복지학과</a>
                     </div>
                 </li>
-                <li><a href="#">마이페이지</a></li>
+                <li><a href="mypage.html">마이페이지</a></li>
             </ul>
             <div class="auth-buttons">
-                <!-- [수정됨] 로그인/회원가입 페이지 링크 경로 -->
-                <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
-                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
+                <a href="login.html" class="btn btn-secondary">로그인</a>
+                <a href="signup.html" class="btn btn-primary">회원가입</a>
             </div>
         </nav>
     </header>
@@ -55,14 +51,9 @@
                 <label for="password" style="display:block; font-weight:600; margin-bottom:8px;">비밀번호</label>
                 <input id="password" name="password" type="password" placeholder="비밀번호" style="width:100%; padding:12px 14px; border:1px solid #eee; border-radius:10px;">
             </div>
-            
-            <!-- [추가됨] 서버 응답 메시지를 표시할 공간 -->
-            <p id="result-message" style="color:red; text-align:center; margin-bottom:10px;"></p>
-
             <button type="submit" class="btn btn-primary" style="width:100%;">로그인</button>
             <div style="text-align:center; margin-top:12px;">
-                <!-- [수정됨] 회원가입 페이지 링크 경로 -->
-                <a href="{{ url_for('signup_email_page') }}" style="text-decoration:none; color: var(--primary-color); font-weight:600;">아직 계정이 없나요? 회원가입</a>
+                <a href="signup.html" style="text-decoration:none; color: var(--primary-color); font-weight:600;">아직 계정이 없나요? 회원가입</a>
             </div>
         </form>
     </main>
@@ -73,47 +64,36 @@
         </div>
     </footer>
 
-    <!-- [추가됨] 로그인 기능을 위한 JavaScript 코드 -->
     <script>
+    document.addEventListener('DOMContentLoaded', function(){
         const loginForm = document.getElementById('login-form');
-        const studentIdInput = document.getElementById('studentId');
-        const passwordInput = document.getElementById('password');
-        const resultMessage = document.getElementById('result-message');
-
-        loginForm.addEventListener('submit', function(event) {
-            // 폼의 기본 제출 동작(새로고침)을 막음
-            event.preventDefault();
-
-            const studentId = studentIdInput.value;
-            const password = passwordInput.value;
-
-            // 백엔드의 /login API로 데이터 전송
-            fetch("{{ url_for('login') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    password: password
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    // 로그인 성공 시 메인 페이지로 이동
-                    alert(data.message); // "로그인 성공!" 알림
-                    window.location.href = "{{ url_for('main_page') }}";
-                } else {
-                    // 로그인 실패 시 오류 메시지 표시
-                    resultMessage.textContent = data.error;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
-            });
+        
+        loginForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            
+            const studentId = document.getElementById('studentId').value;
+            const password = document.getElementById('password').value;
+            
+            // 시연용: 간단한 로그인 검증
+            if (studentId && password) {
+                // 로그인 성공 시 로그인 상태 저장
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', JSON.stringify({
+                    studentId: studentId,
+                    loginTime: new Date().toISOString()
+                }));
+                
+                alert('로그인되었습니다!');
+                // 채팅 페이지로 이동
+                window.location.href = 'chat.html';
+            } else {
+                alert('아이디와 비밀번호를 입력해주세요.');
+            }
         });
+    });
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
+
+

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅 - hub</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.1">
     <style>
         .chat-layout { display:grid; grid-template-columns: 320px 1fr; gap:16px; padding: 24px 0; align-items: start; }
         .panel { background:#fff; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.05); }
@@ -155,10 +155,6 @@
                             <div id="cardMeta" style="font-size:0.9rem; color:#666;"></div>
                             <div id="cardBio" style="margin-top:4px;"></div>
                         </div>
-                            <div style="display:flex; gap:8px;">
-                                <a class="btn btn-secondary" href="mypage.html">프로필 수정하기</a>
-                                <a class="btn btn-secondary" href="signup.html">프로필 인증</a>
-                            </div>
                         </div>
 
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
@@ -236,17 +232,34 @@
         }
         renderCard();
         
+        // 로그인 상태 확인 (실제로는 서버에서 확인해야 함)
+        function isLoggedIn(){
+            // 시연용: 로그인 상태를 localStorage에서 확인
+            return localStorage.getItem('isLoggedIn') === 'true';
+        }
+        
         // 익명카드 로드/표시
         function loadAnon(){
+            // 로그인이 안되어 있으면 익명카드 로드 안함
+            if (!isLoggedIn()) return null;
             try { return JSON.parse(localStorage.getItem('anonProfile')||'null'); } catch(e){ return null; }
         }
-        function hasAnon(){ const a = loadAnon(); return a && a.year; }
+        function hasAnon(){ 
+            // 로그인이 안되어 있으면 익명카드가 없다고 판단
+            if (!isLoggedIn()) return false;
+            const a = loadAnon(); 
+            return a && a.year; 
+        }
         function toggleUI(){
             const chat = document.getElementById('chat-ui');
             const setup = document.getElementById('anon-setup');
-            // 항상 채팅 UI를 표시하고 설정 화면은 숨김
-            chat.style.display='grid'; 
-            setup.style.display='none';
+            if(hasAnon()){ 
+                chat.style.display='grid'; 
+                setup.style.display='none'; 
+            } else { 
+                chat.style.display='none'; 
+                setup.style.display='block'; 
+            }
         }
         toggleUI();
 
@@ -279,6 +292,13 @@
         });
         form.addEventListener('submit', (e)=>{
             e.preventDefault();
+            
+            // 로그인 상태 확인
+            if (!isLoggedIn()) {
+                alert('익명 프로필을 저장하려면 먼저 로그인해주세요.');
+                return;
+            }
+            
             const year = document.getElementById('ap_year').value;
             const gender = (genderBtns.find(b=>b.classList.contains('active'))||{}).dataset?.gender || '남자';
             const nicknameValue = nickname.value.trim() || '익명의친구';
@@ -287,7 +307,7 @@
             localStorage.setItem('anonProfile', JSON.stringify(profile));
             toggleUI();
             renderCard();
-            alert('익명 프로필이 저장되었습니다.');
+            alert('익명 프로필이 저장되었습니다. 이제 매칭을 시작할 수 있습니다!');
         });
 
         // 관심 분야 목록 표시 및 채팅방 생성
@@ -351,6 +371,16 @@
 
         // 1:1 매칭 시작
         function startRandomMatching() {
+            // 익명카드가 없으면 설정 화면 표시
+            if (!hasAnon()) {
+                const chat = document.getElementById('chat-ui');
+                const setup = document.getElementById('anon-setup');
+                chat.style.display = 'none';
+                setup.style.display = 'block';
+                alert('매칭을 시작하려면 먼저 익명 프로필을 설정해주세요.');
+                return;
+            }
+
             randomMatching = true;
             randomStartTime = Date.now();
             btnStartRandom.style.display = 'none';
@@ -368,6 +398,16 @@
 
         // 그룹 매칭 시작
         function startGroupMatching() {
+            // 익명카드가 없으면 설정 화면 표시
+            if (!hasAnon()) {
+                const chat = document.getElementById('chat-ui');
+                const setup = document.getElementById('anon-setup');
+                chat.style.display = 'none';
+                setup.style.display = 'block';
+                alert('매칭을 시작하려면 먼저 익명 프로필을 설정해주세요.');
+                return;
+            }
+
             groupMatching = true;
             groupStartTime = Date.now();
             btnStartGroup.style.display = 'none';
@@ -526,7 +566,23 @@
         });
 
         // 프로필 저장 시 관심사 목록 갱신
-        window.addEventListener('storage', renderInterestList);
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'isLoggedIn' && e.newValue === null) {
+                // 로그아웃 시 익명카드 초기화
+                const chat = document.getElementById('chat-ui');
+                const setup = document.getElementById('anon-setup');
+                chat.style.display = 'none';
+                setup.style.display = 'block';
+                // 폼 초기화
+                document.getElementById('anon-form').reset();
+                document.getElementById('ap_count').textContent = '0';
+                document.getElementById('ap_nickname_count').textContent = '0';
+                Array.from(document.querySelectorAll('.chip')).forEach(c => c.classList.remove('selected'));
+                Array.from(document.querySelectorAll('[data-gender]')).forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-gender="남자"]').classList.add('active');
+            }
+            renderInterestList();
+        });
         renderInterestList();
     });
     </script>
