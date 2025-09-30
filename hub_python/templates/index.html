@@ -3,45 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hub - 우리들의 새로운 이야기</title>
-    
-    <link rel="stylesheet" href="style.css?v=1.1">
-    
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <title>Web Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
     <header id="main-header">
         <nav class="container">
         <div class="logo">
-            <img src="logo.png" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;">
+            <!-- 수정됨: 'images/' 경로 삭제 -->
+            <a href="{{ url_for('main_page') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
         </div>
             <ul class="nav-links">
                 <li><a href="#features">서비스 소개</a></li>
                 <li>
-                    <a href="chat.html">랜덤 매칭</a>
+                    <a href="{{ url_for('chat_page') }}">랜덤 매칭</a>
                     <div class="dropdown-menu">
-                        <a href="chat.html#random">랜덤 1대1 매칭</a>
-                        <a href="chat.html#group">랜덤 그룹 매칭</a>
+                        <a href="{{ url_for('chat_page') }}#random">랜덤 1대1 매칭</a>
+                        <a href="{{ url_for('chat_page') }}#group">랜덤 그룹 매칭</a>
                     </div>
                 </li>
                 <li>
-                    <a href="boards.html">게시판</a>
+                    <a href="{{ url_for('boards_page') }}">게시판</a>
                     <div class="dropdown-menu">
-                        <a href="boards.html#ai">AI융합부</a>
-                        <a href="boards.html#bible">성서학과</a>
-                        <a href="boards.html#nursing">간호학과</a>
-                        <a href="boards.html#child">영유아보육학과</a>
-                        <a href="boards.html#social">사회복지학과</a>
+                        <a href="{{ url_for('boards_page') }}#ai">AI융합부</a>
+                        <a href="{{ url_for('boards_page') }}#bible">성서학과</a>
+                        <a href="{{ url_for('boards_page') }}#nursing">간호학과</a>
+                        <a href="{{ url_for('boards_page') }}#child">영유아보육학과</a>
+                        <a href="{{ url_for('boards_page') }}#social">사회복지학과</a>
                     </div>
                 </li>
-                <li><a href="mypage.html">마이페이지</a></li>
+                <li><a href="{{ url_for('mypage_page') }}">마이페이지</a></li>
             </ul>
             <div class="auth-buttons">
-                <a href="login.html" class="btn btn-secondary">로그인</a>
-                <a href="signup.html" class="btn btn-primary">회원가입</a>
+                {% if nickname %}
+                    <span style="color: #333; font-weight: 600;">{{ nickname }}님 환영합니다!</span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">로그아웃</a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
+                    <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
+                {% endif %}
             </div>
         </nav>
     </header>
@@ -51,7 +52,7 @@
             <div class="container" data-aos="fade-up">
                 <h1>일상의 캠퍼스, <br>특별한 우리들의 이야기</h1>
                 <p>익숙했던 공간에서 펼쳐지는 새로운 만남, 지금 바로 시작해보세요.</p>
-                <a href="signup.html" class="btn btn-primary btn-large">지금 시작하기</a>
+                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary btn-large">지금 시작하기</a>
             </div>
         </section>
 
@@ -99,6 +100,7 @@
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script.js"></script>
+    <!-- 수정됨: 'js/' 경로 삭제 -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

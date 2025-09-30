@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from whitenoise import WhiteNoise
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -10,6 +11,7 @@ from datetime import timedelta
 
 # --- 초기 설정 ---
 app = Flask(__name__)
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", prefix="static/")
 CORS(app)
 
 # Render의 환경 변수를 사용합니다.
