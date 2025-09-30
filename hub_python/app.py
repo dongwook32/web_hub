@@ -9,22 +9,20 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import timedelta
 
-# --- 초기 설정 ---
+# --- 초기 설정 (변경 없음) ---
 app = Flask(__name__)
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", prefix="static/")
 CORS(app)
 
-# Render의 환경 변수를 사용합니다.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
 app.secret_key = os.environ.get('SECRET_KEY')
-
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# --- 데이터베이스 모델 정의 ---
+# --- 데이터베이스 모델 정의 (변경 없음) ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -37,7 +35,7 @@ class EmailVerification(db.Model):
     email = db.Column(db.String(100), nullable=False)
     token = db.Column(db.String(100), unique=True, nullable=False)
 
-# --- 이메일 발송 함수 ---
+# --- 이메일 발송 함수 (변경 없음) ---
 def send_verification_email(to_email, token):
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = app.config['SENDINBLUE_API_KEY']
@@ -69,19 +67,28 @@ def main_page():
 def login_page():
     return render_template('login.html')
 
-@app.route('/signup-page')
-def signup_email_page():
-    return render_template('signup_email.html')
+# =================================================================
+# ✅ [수정됨] 실제 파일명과 일치하도록 render_template 부분을 수정했습니다.
+# =================================================================
 
-@app.route('/verify/<token>')
+@app.route('/signup-terms')  # 1단계: 약관 동의 페이지
+def signup_terms_page():
+    return render_template('certify.html') # certify.html 로 연결
+
+@app.route('/signup-page')  # 2단계: 이메일 인증 페이지
+def signup_email_page():
+    return render_template('email_signup.html') # email_signup.html 로 연결
+
+@app.route('/verify/<token>') # 3단계: 회원정보 입력 페이지
 def show_signup_form(token):
     verification_data = EmailVerification.query.filter_by(token=token).first()
     if verification_data:
-        return render_template('signup_form.html', user_email=verification_data.email, token=token)
+        # signup.html 로 연결
+        return render_template('signup.html', user_email=verification_data.email, token=token)
     else:
         return "유효하지 않거나 만료된 인증 링크입니다.", 404
 
-# --- [추가됨] 모든 페이지 라우트 ---
+# --- 기타 페이지 라우트 (변경 없음) ---
 @app.route('/chat')
 def chat_page():
     if 'user_id' not in session:
@@ -102,8 +109,8 @@ def mypage_page():
         return redirect(url_for('login_page'))
     nickname = session.get('nickname')
     return render_template('mypage.html', nickname=nickname)
-# ------------------------------------
 
+# --- API 라우트들 (변경 없음) ---
 @app.route('/send-verification', methods=['POST'])
 def start_verification():
     email = request.json['email']
@@ -111,12 +118,10 @@ def start_verification():
         return jsonify({"error": "성서대학교 이메일만 사용할 수 있습니다."}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "이미 가입된 이메일입니다."}), 409
-        
     token = str(uuid.uuid4())
     new_verification = EmailVerification(email=email, token=token)
     db.session.add(new_verification)
     db.session.commit()
-    
     if send_verification_email(email, token):
         return jsonify({"message": "인증 이메일이 발송되었습니다."})
     else:
@@ -126,25 +131,19 @@ def start_verification():
 def signup():
     data = request.json
     token = data.get('token')
-    
     verification_data = EmailVerification.query.filter_by(token=token).first()
     if not verification_data:
         return jsonify({"error": "유효하지 않은 토큰입니다."}), 400
-
     email = verification_data.email
     student_id = data.get('student_id')
     password = data.get('password')
     nickname = data.get('nickname')
-
     if not all([student_id, password, nickname]):
         return jsonify({"error": "모든 필드를 입력해주세요."}), 400
-
     if User.query.filter_by(student_id=student_id).first() or \
        User.query.filter_by(nickname=nickname).first():
         return jsonify({"error": "이미 사용 중인 학번 또는 닉네임입니다."}), 409
-    
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-    
     new_user = User(
         email=email,
         student_id=student_id,
@@ -154,7 +153,6 @@ def signup():
     db.session.add(new_user)
     db.session.delete(verification_data)
     db.session.commit()
-    
     return jsonify({"message": "회원가입이 완료되었습니다! 로그인 페이지로 이동합니다."}), 201
 
 @app.route('/login', methods=['POST'])
@@ -162,9 +160,7 @@ def login():
     data = request.json
     student_id = data.get('student_id')
     password = data.get('password')
-
     user = User.query.filter_by(student_id=student_id).first()
-
     if user and bcrypt.check_password_hash(user.password_hash, password):
         session.permanent = True
         session['user_id'] = user.id
@@ -178,10 +174,8 @@ def logout():
     session.clear()
     return redirect(url_for('main_page'))
 
-# This block is not executed in production on Render
-# It's only for running the app on your local computer
+# --- 서버 실행 (변경 없음) ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-

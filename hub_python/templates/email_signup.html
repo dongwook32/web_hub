@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBU Hub 회원가입 - 이메일 인증</title>
+    <style>
+        /* 이전 약관 동의 페이지와 동일한 스타일을 적용하여 통일감을 줍니다. */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px
+            20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px; /* 이메일 폼에 맞게 너비 조정 */
+            overflow: hidden;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #email-input {
+            flex-grow: 1;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        #send-btn {
+            background-color: #4e54c8;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #send-btn:hover {
+            background-color: #3c41a0;
+        }
+
+        #send-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #result-message {
+            margin-top: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            height: 20px; /* 메시지 영역 높이 고정 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>이메일 인증</h1>
+        <p>KBU Hub는 재학생 확인을 위해<br>학교 이메일 인증이 필요합니다.</p>
+
+        <div class="input-group">
+            <input type="email" id="email-input" placeholder="학교 이메일 (@bible.ac.kr)">
+            <button id="send-btn">인증 요청</button>
+        </div>
+        
+        <p id="result-message"></p>
+    </div>
+
+    <script>
+        // --- JavaScript 연동 로직 ---
+
+        // 1. HTML 요소들을 가져옵니다.
+        const emailInput = document.getElementById('email-input');
+        const sendBtn = document.getElementById('send-btn');
+        const resultMessage = document.getElementById('result-message');
+
+        // 2. '인증 요청' 버튼 클릭 시 실행할 함수를 정의합니다.
+        sendBtn.addEventListener('click', function() {
+            const email = emailInput.value;
+
+            // 2-1. 간단한 이메일 형식 검사
+            if (!email || !email.includes('@bible.ac.kr')) {
+                resultMessage.textContent = '올바른 학교 이메일 주소를 입력하세요.';
+                resultMessage.style.color = 'red';
+                return;
+            }
+
+            // 2-2. 요청 보내는 동안 버튼 비활성화 (중복 클릭 방지)
+            sendBtn.disabled = true;
+            sendBtn.textContent = '전송 중...';
+            resultMessage.textContent = '';
+
+
+            // 3. fetch API를 사용해 서버에 이메일 정보를 보냅니다.
+            //    이 부분이 app.py의 @app.route('/send-verification')와 통신하는 핵심입니다.
+            fetch("{{ url_for('start_verification') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }) // 데이터를 JSON 형태로 변환
+            })
+            .then(response => response.json()) // 서버의 응답을 JSON으로 파싱
+            .then(data => {
+                // 4. 서버로부터 받은 응답에 따라 메시지를 표시합니다.
+                if (data.message) { // 성공 메시지가 있는 경우
+                    resultMessage.textContent = data.message;
+                    resultMessage.style.color = 'blue';
+                    emailInput.readOnly = true; // 성공 시 입력창 잠금
+                } else { // 오류 메시지가 있는 경우
+                    resultMessage.textContent = '오류: ' + data.error;
+                    resultMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                // 5. 네트워크 오류 등 예외 상황 처리
+                console.error('Error:', error);
+                resultMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
+                resultMessage.style.color = 'red';
+            })
+            .finally(() => {
+                // 6. 요청 완료 후 버튼 상태를 원래대로 되돌립니다.
+                sendBtn.disabled = false;
+                sendBtn.textContent = '인증 요청';
+            });
+        });
+    </script>
+</body>
+</html>

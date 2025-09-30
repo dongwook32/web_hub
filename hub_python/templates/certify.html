@@ -2,53 +2,224 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>학생 이메일 인증</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBU Hub 회원가입</title>
+    <style>
+        /* 전체 페이지 스타일 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* 흰색 카드 영역 */
+        .signup-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 680px;
+            overflow: hidden;
+        }
+
+        /* 상단 배너 이미지 영역 */
+        .header-banner {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header-banner h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        /* 메인 콘텐츠 영역 (패딩) */
+        .content {
+            padding: 40px;
+        }
+
+        /* 제목 부분 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .title-section h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .title-section p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* 약관 동의 영역 */
+        .consent-section .consent-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .consent-section #consent-all-item {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            border-color: #ccc;
+        }
+
+        .consent-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .consent-item label {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+
+        .consent-item .view-terms {
+            color: #555;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .consent-item .view-terms:hover {
+            background-color: #f0f0f0;
+        }
+
+        .required { color: #4e54c8; font-weight: bold; }
+        .optional { color: #888; }
+
+
+        /* '다음' 버튼 */
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .next-btn {
+            background-color: #4e54c8;
+            color: white;
+            border: none;
+            padding: 15px 60px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .next-btn:hover {
+            background-color: #3c41a0;
+        }
+        .next-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>학교 이메일로 인증하기</h1>
-    <p>학교 이메일(@...ac.kr)을 입력하고 인증 버튼을 눌러주세요.</p>
+    <div class="signup-container">
+        <header class="header-banner">
+            <h1>KBU Hub 시작하기</h1>
+        </header>
+        <main class="content">
+            <div class="title-section">
+                <h2>KBU Hub 서비스 이용약관</h2>
+                <p>서비스 이용을 위해 아래 이용약관 및 정보이용에 동의해 주세요.</p>
+            </div>
 
-    <input type="email" id="email-input" placeholder="학교 이메일을 입력하세요">
+            <div class="consent-section">
+                <div class="consent-item" id="consent-all-item">
+                    <input type="checkbox" id="check-all">
+                    <label for="check-all">전체 동의</label>
+                </div>
 
-    <button id="send-btn">인증 메일 요청</button>
+                <div class="consent-item">
+                    <input type="checkbox" id="check-terms" class="required-check">
+                    <label for="check-terms">서비스 이용약관 동의 <span class="required">(필수)</span></label>
+                    <a href="#" class="view-terms">전문 보기</a>
+                </div>
 
-    <p id="result-message"></p>
+                <div class="consent-item">
+                    <input type="checkbox" id="check-privacy" class="required-check">
+                    <label for="check-privacy">개인정보 수집 및 이용 동의 <span class="required">(필수)</span></label>
+                    <a href="#" class="view-terms">전문 보기</a>
+                </div>
+
+                <div class="consent-item">
+                    <input type="checkbox" id="check-marketing" class="optional-check">
+                    <label for="check-marketing">마케팅 정보 수신 동의 <span class="optional">(선택)</span></label>
+                    <a href="#" class="view-terms">전문 보기</a>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="next-btn" id="next-button" disabled>다음</button>
+            </div>
+        </main>
+    </div>
 
     <script>
-        // HTML 요소들을 JavaScript 변수에 담기
-        const emailInput = document.getElementById('email-input');
-        const sendBtn = document.getElementById('send-btn');
-        const resultMessage = document.getElementById('result-message');
+        // HTML 요소 가져오기
+        const checkAll = document.getElementById('check-all');
+        const requiredChecks = document.querySelectorAll('.required-check');
+        const allChecks = document.querySelectorAll('.consent-section input[type="checkbox"]');
+        const nextButton = document.getElementById('next-button');
 
-        // '인증 메일 요청' 버튼을 클릭했을 때 실행할 함수 설정
-        sendBtn.addEventListener('click', function() {
-            const email = emailInput.value; // 입력창에 적힌 이메일 값 가져오기
-
-            // [매우 중요!] 백엔드 서버 API 주소를 동적으로 변경하도록 수정
-            fetch("{{ url_for('start_verification') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: email })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    resultMessage.textContent = data.message;
-                    resultMessage.style.color = 'blue';
-                } else {
-                    resultMessage.textContent = '오류: ' + data.error;
-                    resultMessage.style.color = 'red';
+        // '다음' 버튼 활성화/비활성화 함수
+        function updateNextButtonState() {
+            let allRequiredChecked = true;
+            requiredChecks.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    allRequiredChecked = false;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultMessage.textContent = '서버와 통신 중 오류가 발생했습니다.';
-                resultMessage.style.color = 'red';
+            });
+            nextButton.disabled = !allRequiredChecked;
+        }
+
+        // '전체 동의' 체크박스 클릭 이벤트
+        checkAll.addEventListener('click', function() {
+            allChecks.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateNextButtonState();
+        });
+
+        // 개별 체크박스 클릭 이벤트
+        allChecks.forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                // 개별 체크 해제 시 '전체 동의'도 해제
+                if (!this.checked) {
+                    checkAll.checked = false;
+                }
+
+                // 모든 체크박스가 체크되면 '전체 동의'도 체크
+                let allChecked = true;
+                allChecks.forEach(cb => {
+                    if(cb !== checkAll && !cb.checked) {
+                       allChecked = false;
+                    }
+                });
+                checkAll.checked = allChecked;
+
+                updateNextButtonState();
             });
         });
+
+        // 페이지 로드 시 초기 버튼 상태 업데이트
+        updateNextButtonState();
     </script>
 </body>
 </html>
