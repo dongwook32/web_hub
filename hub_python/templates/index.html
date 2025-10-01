@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Hub</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
 
     <header id="main-header">
         <nav class="container">
         <div class="logo">
-            <!-- 수정됨: 'images/' 경로 삭제 -->
             <a href="{{ url_for('main_page') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
         </div>
             <ul class="nav-links">
@@ -41,7 +41,7 @@
                     <a href="{{ url_for('logout') }}" class="btn btn-secondary">로그아웃</a>
                 {% else %}
                     <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
-                    <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
+                    <a href="{{ url_for('signup_terms_page') }}" class="btn btn-primary">회원가입</a>
                 {% endif %}
             </div>
         </nav>
@@ -52,7 +52,7 @@
             <div class="container" data-aos="fade-up">
                 <h1>일상의 캠퍼스, <br>특별한 우리들의 이야기</h1>
                 <p>익숙했던 공간에서 펼쳐지는 새로운 만남, 지금 바로 시작해보세요.</p>
-                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary btn-large">지금 시작하기</a>
+                <a href="{{ url_for('signup_terms_page') }}" class="btn btn-primary btn-large">지금 시작하기</a>
             </div>
         </section>
 
@@ -88,9 +88,6 @@
                 <span class="department-tag">AI융합학부</span>
             </div>
         </section>
-
-
-        
     </main>
 
     <footer>
@@ -100,7 +97,6 @@
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <!-- 수정됨: 'js/' 경로 삭제 -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

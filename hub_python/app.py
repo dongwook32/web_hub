@@ -9,20 +9,35 @@ import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import timedelta
 
-# --- 초기 설정 (변경 없음) ---
+# --- 초기 설정 ---
 app = Flask(__name__)
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/", prefix="static/")
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
-app.secret_key = os.environ.get('SECRET_KEY')
+# ✅ [수정됨] 로컬 환경과 Render 배포 환경을 구분하여 설정을 자동으로 변경합니다.
+# --------------------------------------------------------------------------
+# Render 서버에서 실행될 때 (환경 변수 'RENDER'가 존재할 때)
+if os.environ.get('RENDER'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+    app.config['SENDINBLUE_API_KEY'] = os.environ.get('SENDINBLUE_API_KEY')
+    app.secret_key = os.environ.get('SECRET_KEY')
+# 내 컴퓨터(로컬)에서 실행될 때
+else:
+    # 데이터베이스는 프로젝트 폴더에 'local_db.sqlite' 파일을 생성하여 사용합니다.
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_db.sqlite'
+    # 이메일 API 키는 로컬에 없으므로 None으로 설정됩니다. (이메일 발송 기능은 로컬에서 테스트 불가)
+    app.config['SENDINBLUE_API_KEY'] = None 
+    # 로컬 테스트를 위한 임시 시크릿 키를 설정합니다.
+    app.secret_key = 'LOCAL_DEV_SECRET_KEY' 
+# --------------------------------------------------------------------------
+
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# --- 데이터베이스 모델 정의 (변경 없음) ---
+
+# --- 데이터베이스 모델 정의 ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -35,14 +50,26 @@ class EmailVerification(db.Model):
     email = db.Column(db.String(100), nullable=False)
     token = db.Column(db.String(100), unique=True, nullable=False)
 
-# --- 이메일 발송 함수 (변경 없음) ---
+
+# --- 이메일 발송 함수 ---
 def send_verification_email(to_email, token):
+    # ✅ [수정됨] 로컬에서는 API 키가 없으므로 이메일 발송을 시도하지 않도록 처리
+    if not app.config['SENDINBLUE_API_KEY']:
+        print("="*50)
+        print("로컬 환경에서는 이메일이 실제로 발송되지 않습니다.")
+        print(f"인증 링크: http://127.0.0.1:5000/verify/{token}")
+        print("="*50)
+        return True # 로컬 테스트를 위해 성공한 것처럼 처리
+
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = app.config['SENDINBLUE_API_KEY']
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     
     subject = "[KBU Hub] 이메일 인증을 완료해주세요."
-    verification_link = f"https://kbuhub.onrender.com/verify/{token}"
+    # ✅ [수정됨] 로컬 테스트를 위해 인증 링크 주소를 동적으로 변경
+    base_url = "https://kbuhub.onrender.com" if os.environ.get('RENDER') else "http://127.0.0.1:5000"
+    verification_link = f"{base_url}/verify/{token}"
+
     html_content = f"가입을 완료하려면 링크를 클릭하세요: <a href='{verification_link}'>인증하기</a>"
     sender = {"name": "KBU Hub 관리자", "email": "dongwook219@gmail.com"}
     to = [{"email": to_email}]
@@ -56,6 +83,7 @@ def send_verification_email(to_email, token):
         print(f"Exception: {e}\n")
         return False
 
+
 # --- 라우트 (페이지 및 API) 정의 ---
 
 @app.route('/')
@@ -67,28 +95,23 @@ def main_page():
 def login_page():
     return render_template('login.html')
 
-# =================================================================
-# ✅ [수정됨] 실제 파일명과 일치하도록 render_template 부분을 수정했습니다.
-# =================================================================
-
-@app.route('/signup-terms')  # 1단계: 약관 동의 페이지
+@app.route('/signup-terms')
 def signup_terms_page():
-    return render_template('certify.html') # certify.html 로 연결
+    return render_template('certify.html')
 
-@app.route('/signup-page')  # 2단계: 이메일 인증 페이지
+@app.route('/signup-page')
 def signup_email_page():
-    return render_template('email_signup.html') # email_signup.html 로 연결
+    return render_template('email_signup.html')
 
-@app.route('/verify/<token>') # 3단계: 회원정보 입력 페이지
+@app.route('/verify/<token>')
 def show_signup_form(token):
     verification_data = EmailVerification.query.filter_by(token=token).first()
     if verification_data:
-        # signup.html 로 연결
         return render_template('signup.html', user_email=verification_data.email, token=token)
     else:
         return "유효하지 않거나 만료된 인증 링크입니다.", 404
 
-# --- 기타 페이지 라우트 (변경 없음) ---
+# --- 기타 페이지 라우트 ---
 @app.route('/chat')
 def chat_page():
     if 'user_id' not in session:
@@ -110,7 +133,7 @@ def mypage_page():
     nickname = session.get('nickname')
     return render_template('mypage.html', nickname=nickname)
 
-# --- API 라우트들 (변경 없음) ---
+# --- API 라우트들 ---
 @app.route('/send-verification', methods=['POST'])
 def start_verification():
     email = request.json['email']
@@ -123,7 +146,7 @@ def start_verification():
     db.session.add(new_verification)
     db.session.commit()
     if send_verification_email(email, token):
-        return jsonify({"message": "인증 이메일이 발송되었습니다."})
+        return jsonify({"message": "인증 이메일이 발송되었습니다. (로컬에서는 터미널을 확인하세요)"})
     else:
         return jsonify({"error": "이메일 발송에 실패했습니다."}), 500
 
@@ -174,7 +197,7 @@ def logout():
     session.clear()
     return redirect(url_for('main_page'))
 
-# --- 서버 실행 (변경 없음) ---
+# --- 서버 실행 ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
