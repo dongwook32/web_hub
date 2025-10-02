@@ -11,7 +11,6 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // ... (tailwind.config는 이전과 동일) ...
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -25,36 +24,46 @@
   </script>
 
   <style>
-    /* ... (기존 커스텀 스타일은 그대로 유지) ... */
     html, body { font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; }
-    .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,19,0) 60%); }
+    .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); }
     .glass{ background: rgba(255,255,255,.7); backdrop-filter: blur(10px); }
     .nav-pill{ position:relative; display:flex; gap:6px; padding:6px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.6)); border:1px solid rgba(255,159,128,.45); }
-    .nav-item{ position:relative; z-index:1; padding:10px 16px; border-radius:999px; font-weight:700; color:#374151; display:flex; align-items:center; gap:8px; transition: transform .18s ease; }
-    .nav-item:hover{ transform: translateY(-2px); }
+.nav-item {
+    position: relative;
+    z-index: 1;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    /* ✅ [수정] 모든 글자색을 흰색으로 변경 */
+    color: #FFFFFF; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color .3s ease, transform .18s ease;
+}
 
-    /* ✅ [수정됨] active 클래스는 이제 JS가 제어하는 bubble의 스타일이 됩니다. */
-    .nav-item.active {
-      /* 실제 배경색은 bubble이 담당하므로 투명하게 처리 */
-      background: transparent;
-      box-shadow: none;
-      color: white; /* 글자색은 흰색으로 유지 */
-    }
+.nav-item:hover {
+    transform: translateY(-2px);
+}
+
+.nav-item.active {
+    /* ✅ [수정] color 속성을 제거하여 부모 스타일을 따르게 함 */
+    /* color: white; <-- 이 줄을 삭제하거나 주석 처리 */
+}
     
-    /* ✅ [추가됨] 마우스를 따라다니는 주황색 빛(bubble)의 스타일 */
+    /* ✅ [수정됨] 애니메이션 bubble 스타일 */
     .nav-bubble {
       position: absolute;
       z-index: 0;
-      top: 6px; /* 부모 요소의 padding 값과 일치 */
+      top: 6px;
       left: 0;
       background: linear-gradient(135deg, #FF9F80, #FFC8B2);
       border-radius: 999px;
       box-shadow: 0 4px 15px rgba(255, 159, 128, 0.3);
-      /* 부드러운 움직임을 위한 transition 효과 */
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
+    
     .py-2.active { background: linear-gradient(135deg, #FF9F80, #FFC8B2); color: white; font-weight: 700; border-radius: 8px; }
-    /* ... (이하 나머지 스타일은 이전과 동일) ... */
     .tilt{ transition: transform .2s ease, box-shadow .2s ease; }
     .tilt:hover{ transform: translateY(-2px) rotate(.2deg); box-shadow: 0 18px 40px rgba(255,159,128,.25); }
     .reveal{ opacity:0; transform: translateY(8px); transition: all .6s ease; }
@@ -67,10 +76,7 @@
     .die{ width:22px; height:22px; border-radius:6px; background:white; display:grid; place-items:center; color:#FF9F80; font-weight:900; box-shadow: inset 0 0 0 2px rgba(255,159,128,.7); }
     .shake{ animation: shake .6s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
+      10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); }
     }
     .glow{ box-shadow: 0 0 0 0 rgba(255,159,128,.6); animation: pulse 2.2s ease-in-out infinite; }
     @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,159,128,.55)} 70%{box-shadow:0 0 0 16px rgba(255,159,128,0)} 100%{box-shadow:0 0 0 0 rgba(255,159,128,0)} }
@@ -116,40 +122,101 @@
     </div>
   </header>
   
+  <main>
+    <section class="max-w-6xl mx-auto px-4 pt-8 pb-6 relative">
+      <div class="floaters">
+          <div class="floater" style="left:10%; bottom:0; animation-duration:8s;">💬</div>
+          <div class="floater" style="left:22%; bottom:10px; animation-duration:9s; animation-delay:.5s;">🌟</div>
+          <div class="floater" style="left:78%; bottom:0; animation-duration:10s; animation-delay:1s;">🤝</div>
+          <div class="floater" style="left:60%; bottom:6px; animation-duration:8.6s; animation-delay:1.2s;">💡</div>
+          <div class="floater" style="left:35%; bottom:-6px; animation-duration:9.4s; animation-delay:.8s;">🎈</div>
+      </div>
+      <p class="text-center text-cocoa">같은 수업, 취미, 관심사를 가진 친구와 자연스럽게 연결될 수 있어요.</p>
+      <div class="rounded-xl2 md:rounded-3xl border border-peach/60 bg-white/70 p-8 md:p-12 shadow-card text-center mt-5 reveal relative overflow-hidden">
+          <div class="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-lemon/60 blur-3xl"></div>
+          <div class="absolute -right-8 -bottom-10 w-40 h-40 rounded-full bg-mint/60 blur-3xl"></div>
+          <div class="text-5xl mb-3">🤝</div>
+          <h1 class="text-2xl md:text-4xl font-extrabold">세대를 잇는 소통의 장</h1>
+          <p class="mt-3 text-cocoa">선배의 경험과 후배의 열정을 이어주며<br class="hidden md:block">따뜻한 연결을 만드는 학과 게시판입니다.</p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+              <a href="{{ url_for('boards_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">선후배와 수다 떨기 📌</a>
+              <button id="diceBtn" class="dice" type="button"><span class="die" id="die">1</span><span>오늘의 인연 만나기</span></button>
+          </div>
+          <div class="text-xs text-cocoa mt-2">클릭할 때마다 🎲가 굴러가요!</div>
+      </div>
+    </section>
+    <section class="max-w-6xl mx-auto px-4 py-6">
+      <div class="grid md:grid-cols-3 gap-5">
+          <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+              <div class="text-2xl">📌</div>
+              <div class="mt-2 font-bold text-lg">게시판</div>
+              <p class="text-cocoa text-sm mt-1">카테고리/태그 정리, 검색·정렬, 북마크/신고.</p>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('boards_page') }}">바로가기 →</a>
+          </div>
+          <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+              <div class="text-2xl">🎲</div>
+              <div class="mt-2 font-bold text-lg">랜덤 매칭</div>
+              <p class="text-cocoa text-sm mt-1">같은 관심사 친구와 가벼운 대화부터.</p>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+          </div>
+          <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+              <div class="text-2xl">💬</div>
+              <div class="mt-2 font-bold text-lg">실시간 채팅</div>
+              <p class="text-cocoa text-sm mt-1">읽음표시, 알림제어, 링크/이미지 미리보기.</p>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+          </div>
+      </div>
+    </section>
+    <section class="max-w-6xl mx-auto px-4 py-6">
+      <div class="reveal rounded-xl2 border border-peach/50 bg-white p-6 md:p-8 shadow-card">
+          <div class="md:flex items-center gap-6">
+              <div class="text-3xl md:text-4xl font-extrabold">안전하고 따뜻한 커뮤니티</div>
+              <div class="grid grid-cols-3 gap-3 md:ml-auto mt-5 md:mt-0 text-center">
+                  <div><div class="text-xl font-extrabold">신고/차단</div><div class="text-xs text-cocoa mt-1">악성 이용자 대응</div></div>
+                  <div><div class="text-xl font-extrabold">익명 옵션</div><div class="text-xs text-cocoa mt-1">글/댓글 단위</div></div>
+                  <div><div class="text-xl font-extrabold">투명 공지</div><div class="text-xs text-cocoa mt-1">가이드/정책 공개</div></div>
+              </div>
+          </div>
+      </div>
+    </section>
+    <section class="max-w-6xl mx-auto px-4 py-10">
+      <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
+          <h3 class="text-2xl md:text-3xl font-extrabold">지금 합류하세요</h3>
+          <p class="mt-2 text-cocoa">크림/피치 감성 + 플레이풀 인터랙션.</p>
+          <div class="mt-6 flex justify-center gap-3">
+              <a href="{{ url_for('signup_terms_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">회원가입 ✨</a>
+              <a href="{{ url_for('main_page') }}" class="px-5 py-3 rounded-bubble border border-peach/70 hover:shadow-soft transition">서비스 소개</a>
+          </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-peach/50">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-cocoa text-center">
+        © <span id="year"></span> KBU hub · All rights reserved.
+    </div>
+  </footer>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // (기존 모바일 메뉴, 푸터, 스크롤, 주사위 기능은 그대로 유지)
-      // 모바일 메뉴 토글
       const menuBtn = document.getElementById('menuBtn');
       if (menuBtn) {
-        menuBtn.addEventListener('click', ()=>{
-          document.getElementById('mobileNav').classList.toggle('hidden');
-        });
+        menuBtn.addEventListener('click', ()=>{ document.getElementById('mobileNav').classList.toggle('hidden'); });
       }
       
-      // 푸터 년도 자동 설정
       const year = document.getElementById('year');
-      if (year) {
-        year.textContent = new Date().getFullYear();
-      }
+      if (year) { year.textContent = new Date().getFullYear(); }
       
-      // 스크롤 시 요소 나타나는 애니메이션
-      const io = new IntersectionObserver((ents)=>ents.forEach(e=>{ 
-        if(e.isIntersecting) e.target.classList.add('reveal-on');
-      }), {threshold:.15});
+      const io = new IntersectionObserver((ents)=>ents.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('reveal-on'); }), {threshold:.15});
       document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
       
-      // 주사위 굴리기 기능
       const die = document.getElementById('die');
       const diceBtn = document.getElementById('diceBtn');
       if (die && diceBtn) {
         function roll(){ 
           diceBtn.classList.add('shake'); 
           let n=1; 
-          const timer=setInterval(()=>{ 
-            n = 1 + Math.floor(Math.random()*6); 
-            die.textContent=n; 
-          }, 60); 
+          const timer=setInterval(()=>{ n = 1 + Math.floor(Math.random()*6); die.textContent=n; }, 60); 
           setTimeout(()=>{ 
             clearInterval(timer); 
             diceBtn.classList.remove('shake'); 
@@ -159,27 +226,28 @@
         diceBtn.addEventListener('click', roll);
       }
       
-      // ✅ [추가됨] 마우스를 따라다니는 내비게이션 bubble 애니메이션 기능
+      // ✅ [추가됨] 내비게이션 bubble 애니메이션 기능
       const navPill = document.getElementById('navPill');
       if (navPill) {
         const navItems = navPill.querySelectorAll('.nav-item');
+        // 버블 요소를 동적으로 생성해서 navPill의 맨 앞에 추가
         const bubble = document.createElement('div');
         bubble.classList.add('nav-bubble');
-        navPill.appendChild(bubble);
+        navPill.prepend(bubble);
 
         function moveBubble(target) {
             const coords = target.getBoundingClientRect();
             const parentCoords = navPill.getBoundingClientRect();
-
             bubble.style.width = `${coords.width}px`;
             bubble.style.height = `${coords.height}px`;
+            // transform 속성을 사용해 부드럽게 이동
             bubble.style.transform = `translateX(${coords.left - parentCoords.left}px)`;
         }
 
         const activeItem = navPill.querySelector('.nav-item.active');
         if (activeItem) {
-            // 페이지 로드 시 bubble을 active 아이템 위치로 이동
-            setTimeout(() => moveBubble(activeItem), 100);
+            // 페이지 로드 시 잠시 후 bubble을 active 아이템 위치로 이동
+            setTimeout(() => moveBubble(activeItem), 50);
         }
 
         navItems.forEach(item => {
