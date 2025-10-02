@@ -94,10 +94,15 @@ def send_verification_email(to_email, token):
 
 # --- 라우트 (페이지 및 API) 정의 ---
 
+# app.py
 @app.route('/')
 def main_page():
     nickname = session.get('nickname')
-    return render_template('index.html', nickname=nickname)
+    
+    # ✅ [추가 추천] 나중에 관리자 메뉴를 만들 때를 위해 is_admin 정보도 함께 전달
+    is_admin = session.get('is_admin', False) 
+    
+    return render_template('index.html', nickname=nickname, is_admin=is_admin)
 
 @app.route('/login-page')
 def login_page():
