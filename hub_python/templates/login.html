@@ -2,99 +2,102 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 { margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        #login-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            color: white;
+            background-color: #4e54c8;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #result-message { height: 20px; margin-top: 20px; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <header id="main-header">
-        <nav class="container">
-            <div class="logo">
-                <a href="{{ url_for('main_page') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Hub Logo" style="height:64px; vertical-align:middle; margin-right:8px;"></a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('main_page') }}#features">서비스 소개</a></li>
-                <li>
-                    <a href="{{ url_for('chat_page') }}">랜덤 매칭</a>
-                    <div class="dropdown-menu">
-                        <a href="{{ url_for('chat_page') }}#random">랜덤 1대1 매칭</a>
-                        <a href="{{ url_for('chat_page') }}#group">랜덤 그룹 매칭</a>
-                    </div>
-                </li>
-                <li>
-                    <a href="{{ url_for('boards_page') }}">게시판</a>
-                    <div class="dropdown-menu">
-                        <a href="{{ url_for('boards_page') }}#ai">AI융합부</a>
-                        <a href="{{ url_for('boards_page') }}#bible">성서학과</a>
-                        <a href="{{ url_for('boards_page') }}#nursing">간호학과</a>
-                        <a href="{{ url_for('boards_page') }}#child">영유아보육학과</a>
-                        <a href="{{ url_for('boards_page') }}#social">사회복지학과</a>
-                    </div>
-                </li>
-                <li><a href="{{ url_for('mypage_page') }}
-                    ">마이페이지</a></li>
-            </ul>
-            <div class="auth-buttons"></div>
-                <a href="{{ url_for('login_page') }}" class="btn btn-secondary">로그인</a>
-                <a href="{{ url_for('signup_email_page') }}" class="btn btn-primary">회원가입</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container" style="padding: 60px 0; max-width: 520px;">
-        <h1 style="text-align:center; margin-bottom: 24px;">로그인</h1>
-        <form id="login-form" style="background:#fff; padding:24px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
-            <div style="margin-bottom:16px;">
-                <label for="studentId" style="display:block; font-weight:600; margin-bottom:8px;">아이디(학번)</label>
-                <input id="studentId" name="studentId" type="text" placeholder="예: 20250001" style="width:100%; padding:12px 14px; border:1px solid #eee; border-radius:10px;">
-            </div>
-            <div style="margin-bottom:16px;">
-                <label for="password" style="display:block; font-weight:600; margin-bottom:8px;">비밀번호</label>
-                <input id="password" name="password" type="password" placeholder="비밀번호" style="width:100%; padding:12px 14px; border:1px solid #eee; border-radius:10px;">
-            </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;">로그인</button>
-            <div style="text-align:center; margin-top:12px;">
-                <a href="signup.html" style="text-decoration:none; color: var(--primary-color); font-weight:600;">아직 계정이 없나요? 회원가입</a>
-            </div>
-        </form>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 KBU Hub. All Rights Reserved.</p>
+    <div class="container">
+        <h1>로그인</h1>
+        <div class="form-group">
+            <label for="student-id">학번</label>
+            <input type="text" id="student-id" placeholder="학번">
         </div>
-    </footer>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" placeholder="비밀번호">
+        </div>
+        <p id="result-message"></p>
+        <button id="login-btn">로그인</button>
+    </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const loginForm = document.getElementById('login-form');
-        
-        loginForm.addEventListener('submit', function(e){
-            e.preventDefault();
-            
-            const studentId = document.getElementById('studentId').value;
-            const password = document.getElementById('password').value;
-            
-            // 시연용: 간단한 로그인 검증
-            if (studentId && password) {
-                // 로그인 성공 시 로그인 상태 저장
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('currentUser', JSON.stringify({
-                    studentId: studentId,
-                    loginTime: new Date().toISOString()
-                }));
-                
-                alert('로그인되었습니다!');
-                // 채팅 페이지로 이동
-                window.location.href = 'chat_html';
-            } else {
-                alert('아이디와 비밀번호를 입력해주세요.');
-            }
+        const loginBtn = document.getElementById('login-btn');
+        const studentIdInput = document.getElementById('student-id');
+        const passwordInput = document.getElementById('password');
+        const resultMessage = document.getElementById('result-message');
+
+        loginBtn.addEventListener('click', function() {
+            const studentId = studentIdInput.value;
+            const password = passwordInput.value;
+
+            fetch("{{ url_for('login') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // 로그인 성공 시
+                    resultMessage.textContent = data.message;
+                    resultMessage.style.color = 'blue';
+                    // ✅ [수정됨] 404 오류의 원인. 메인 페이지로 이동하도록 수정.
+                    window.location.href = "{{ url_for('main_page') }}";
+                } else {
+                    // 로그인 실패 시
+                    resultMessage.textContent = '오류: ' + data.error;
+                    resultMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultMessage.textContent = '서버 통신 오류가 발생했습니다.';
+            });
         });
-    });
     </script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-
