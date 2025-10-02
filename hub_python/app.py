@@ -48,8 +48,10 @@ class User(db.Model):
     nickname = db.Column(db.String(50), unique=True, nullable=False) # 닉네임은 중복확인을 위해 유지
     birthdate = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(20), nullable=False)
-    
     email = db.Column(db.String(100), unique=True, nullable=False)
+    
+    # ✅ [추가됨] 관리자 여부를 표시하는 컬럼. 기본값은 False(일반 사용자)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
 class EmailVerification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -217,6 +219,8 @@ def login():
         session.permanent = True
         session['user_id'] = user.id
         session['nickname'] = user.nickname
+        # ✅ [추가됨] 로그인 시 관리자 여부를 세션에 저장
+        session['is_admin'] = user.is_admin 
         return jsonify({"message": "로그인 성공!"}), 200
     else:
         return jsonify({"error": "학번 또는 비밀번호가 일치하지 않습니다."}), 401
@@ -225,6 +229,57 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('main_page'))
+
+# --- 관리자 기능 ---
+
+# 임시: 특정 사용자를 관리자로 지정하는 경로 (개발용)
+# 사용법: 관리자로 만들 계정으로 회원가입 -> 이 주소 한번 방문 -> 로그아웃 -> 다시 로그인
+@app.route('/make-admin')
+def make_admin():
+    if 'user_id' not in session:
+        return "로그인 먼저 하세요.", 403
+
+    # ✅ 본인의 학번으로 변경해서 사용하세요.
+    admin_student_id = "202204034" # 여기에 관리자로 지정할 본인의 학번을 넣으세요.
+
+    user = User.query.filter_by(student_id=admin_student_id).first()
+    if user:
+        user.is_admin = True
+        db.session.commit()
+        return f"{user.name} 님이 관리자로 지정되었습니다."
+    return "해당 학번의 사용자를 찾을 수 없습니다.", 404
+
+
+# 관리자 페이지: 모든 사용자 정보를 보여줌
+@app.route('/admin')
+def admin_page():
+    # 관리자가 아니면 접근 거부
+    if not session.get('is_admin'):
+        return redirect(url_for('main_page'))
+
+    all_users = User.query.all()
+    nickname = session.get('nickname')
+    return render_template('admin.html', users=all_users, nickname=nickname)
+
+
+# 사용자 삭제 API
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    # 관리자가 아니면 접근 거부
+    if not session.get('is_admin'):
+        return jsonify({"error": "권한이 없습니다."}), 403
+
+    user_to_delete = User.query.get(user_id)
+    if user_to_delete:
+        # 자기 자신은 삭제할 수 없도록 방지
+        if user_to_delete.id == session.get('user_id'):
+            return jsonify({"error": "자기 자신은 삭제할 수 없습니다."}), 400
+        
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return jsonify({"message": f"사용자 '{user_to_delete.name}' (이)가 삭제되었습니다."})
+    
+    return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
 
 # --- 서버 실행 ---
 if __name__ == '__main__':

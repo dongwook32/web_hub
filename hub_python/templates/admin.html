@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 페이지</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; background-color: #f9f9f9; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .delete-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        .delete-btn:hover { background-color: #c0392b; }
+    </style>
+</head>
+<body>
+    <h1>관리자 페이지 - 사용자 목록</h1>
+    <p>안녕하세요, {{ nickname }} 관리자님.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>이름(닉네임)</th>
+                <th>학번</th>
+                <th>이메일</th>
+                <th>생년월일</th>
+                <th>재학상태</th>
+                <th>관리자</th>
+                <th>작업</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr id="user-row-{{ user.id }}">
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.student_id }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.birthdate }}</td>
+                <td>{{ user.status }}</td>
+                <td>{{ '예' if user.is_admin else '아니오' }}</td>
+                <td>
+                    <button class="delete-btn" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">삭제</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const userName = this.dataset.userName;
+
+                if (confirm(`정말로 '${userName}' 사용자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
+                    fetch(`/admin/delete_user/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message || data.error);
+                        if (data.message) {
+                            // 성공적으로 삭제되면 화면에서 해당 줄을 제거
+                            document.getElementById(`user-row-${userId}`).remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('오류가 발생했습니다.');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
