@@ -34,7 +34,7 @@
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 8px;
-            box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+            box-sizing: border-box;
         }
         #signup-btn {
             background-color: #4e54c8;
@@ -49,6 +49,23 @@
             margin-top: 10px;
         }
         #result-message { margin-top: 20px; font-weight: bold; height: 20px; }
+
+        /* ✅ [추가됨] 비밀번호 보기 기능을 위한 스타일 */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .password-wrapper input {
+            padding-right: 45px; /* 아이콘이 들어갈 공간 확보 */
+        }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -79,13 +96,20 @@
                 <option value="편입생">편입생</option>
             </select>
         </div>
+
         <div class="form-group">
             <label for="password">비밀번호</label>
-            <input type="password" id="password" placeholder="비밀번호">
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="비밀번호">
+                <span class="toggle-password" id="toggle-password">👁️</span>
+            </div>
         </div>
         <div class="form-group">
             <label for="password-confirm">비밀번호 확인</label>
-            <input type="password" id="password-confirm" placeholder="비밀번호를 한번 더 입력하세요">
+            <div class="password-wrapper">
+                <input type="password" id="password-confirm" placeholder="비밀번호를 한번 더 입력하세요">
+                <span class="toggle-password" id="toggle-password-confirm">👁️</span>
+            </div>
         </div>
         
         <p id="result-message"></p>
@@ -103,7 +127,30 @@
         const tokenInput = document.getElementById('verification-token');
         const resultMessage = document.getElementById('result-message');
 
+        // ✅ [추가됨] 비밀번호 보기 아이콘 요소 가져오기
+        const togglePassword = document.getElementById('toggle-password');
+        const togglePasswordConfirm = document.getElementById('toggle-password-confirm');
+
+        // ✅ [추가됨] 첫 번째 비밀번호 아이콘 클릭 이벤트
+        togglePassword.addEventListener('click', function () {
+            // 입력창의 type을 password와 text 사이에서 전환
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // 아이콘 모양 변경
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+        // ✅ [추가됨] 두 번째 비밀번호 확인 아이콘 클릭 이벤트
+        togglePasswordConfirm.addEventListener('click', function () {
+            const type = passwordConfirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordConfirmInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+
+
+        // (가입 완료 버튼 클릭 이벤트는 이전과 동일)
         signupBtn.addEventListener('click', function() {
+            // ... (이전과 동일한 코드) ...
             const studentId = studentIdInput.value;
             const name = nameInput.value;
             const birthdate = birthdateInput.value;
@@ -111,16 +158,6 @@
             const password = passwordInput.value;
             const passwordConfirm = passwordConfirmInput.value;
             const token = tokenInput.value;
-
-            // ==========================================================
-            // ✅ [추가됨] 어떤 값이 비어있는지 확인하기 위한 console.log
-            // ==========================================================
-            console.log("학번:", studentId);
-            console.log("이름:", name);
-            console.log("생년월일:", birthdate);
-            console.log("재학 상태:", status);
-            console.log("비밀번호:", password);
-            // ==========================================================
 
             if (password !== passwordConfirm) {
                 resultMessage.textContent = '오류: 비밀번호가 일치하지 않습니다.';
