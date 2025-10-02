@@ -112,14 +112,22 @@
             const passwordConfirm = passwordConfirmInput.value;
             const token = tokenInput.value;
 
-            // ✅ [추가됨] 비밀번호 일치 여부 확인
+            // ==========================================================
+            // ✅ [추가됨] 어떤 값이 비어있는지 확인하기 위한 console.log
+            // ==========================================================
+            console.log("학번:", studentId);
+            console.log("이름:", name);
+            console.log("생년월일:", birthdate);
+            console.log("재학 상태:", status);
+            console.log("비밀번호:", password);
+            // ==========================================================
+
             if (password !== passwordConfirm) {
                 resultMessage.textContent = '오류: 비밀번호가 일치하지 않습니다.';
                 resultMessage.style.color = 'red';
-                return; // 함수 종료
+                return;
             }
 
-            // ✅ [추가됨] 모든 필드가 채워졌는지 확인
             if (!studentId || !name || !birthdate || !status || !password) {
                 resultMessage.textContent = '오류: 모든 항목을 입력해주세요.';
                 resultMessage.style.color = 'red';

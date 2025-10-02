@@ -160,28 +160,51 @@ def start_verification():
 def signup():
     data = request.json
     token = data.get('token')
+    
+    # 토큰 유효성 검사
     verification_data = EmailVerification.query.filter_by(token=token).first()
     if not verification_data:
-        return jsonify({"error": "유효하지 않은 토큰입니다."}), 400
+        return jsonify({"error": "유효하지 않은 인증 세션입니다. 다시 시도해주세요."}), 400
+
     email = verification_data.email
+    
+    # 프론트엔드로부터 모든 데이터 받아오기
     student_id = data.get('student_id')
+    name = data.get('name')
+    birthdate = data.get('birthdate')
+    status = data.get('status')
     password = data.get('password')
-    nickname = data.get('nickname')
-    if not all([student_id, password, nickname]):
-        return jsonify({"error": "모든 필드를 입력해주세요."}), 400
-    if User.query.filter_by(student_id=student_id).first() or \
-       User.query.filter_by(nickname=nickname).first():
-        return jsonify({"error": "이미 사용 중인 학번 또는 닉네임입니다."}), 409
+
+    # ✅ [수정됨] 닉네임을 '이름' 필드 값으로 설정
+    nickname = name 
+
+    # 모든 필드가 제대로 들어왔는지 서버에서 다시 한번 확인
+    if not all([student_id, name, nickname, birthdate, status, password]):
+        return jsonify({"error": "서버 오류: 일부 데이터가 누락되었습니다."}), 400
+
+    # 학번 또는 닉네임(이름) 중복 확인
+    if User.query.filter_by(student_id=student_id).first():
+        return jsonify({"error": "이미 사용 중인 학번입니다."}), 409
+    if User.query.filter_by(nickname=nickname).first():
+         return jsonify({"error": "이미 가입된 이름입니다. 관리자에게 문의하세요."}), 409
+    
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    
     new_user = User(
         email=email,
         student_id=student_id,
         password_hash=password_hash,
-        nickname=nickname
+        name=name,
+        nickname=nickname,
+        birthdate=birthdate,
+        status=status
     )
+    
+    # 데이터베이스에 최종 저장
     db.session.add(new_user)
-    db.session.delete(verification_data)
+    db.session.delete(verification_data) # 사용된 인증 토큰은 삭제
     db.session.commit()
+    
     return jsonify({"message": "회원가입이 완료되었습니다! 로그인 페이지로 이동합니다."}), 201
 
 @app.route('/login', methods=['POST'])
