@@ -200,12 +200,9 @@
         // 개별 체크박스 클릭 이벤트
         allChecks.forEach(checkbox => {
             checkbox.addEventListener('click', function() {
-                // 개별 체크 해제 시 '전체 동의'도 해제
                 if (!this.checked) {
                     checkAll.checked = false;
                 }
-
-                // 모든 체크박스가 체크되면 '전체 동의'도 체크
                 let allChecked = true;
                 allChecks.forEach(cb => {
                     if(cb !== checkAll && !cb.checked) {
@@ -213,9 +210,15 @@
                     }
                 });
                 checkAll.checked = allChecked;
-
                 updateNextButtonState();
             });
+        });
+        
+        // '다음' 버튼 클릭 이벤트
+        nextButton.addEventListener('click', function() {
+            if (!this.disabled) {
+                window.location.href = "{{ url_for('signup_email_page') }}";
+            }
         });
 
         // 페이지 로드 시 초기 버튼 상태 업데이트
