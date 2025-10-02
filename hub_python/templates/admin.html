@@ -9,8 +9,13 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         th { background-color: #f2f2f2; }
-        .delete-btn { background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        button { border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; color: white; margin-right: 5px;}
+        .delete-btn { background-color: #e74c3c; }
         .delete-btn:hover { background-color: #c0392b; }
+        /* ✅ [추가됨] 권한 변경 버튼 스타일 */
+        .admin-toggle-btn { background-color: #3498db; }
+        .admin-toggle-btn.is-admin { background-color: #95a5a6; } /* 이미 관리자일 때 버튼 색 */
+        .admin-toggle-btn:hover { background-color: #2980b9; }
     </style>
 </head>
 <body>
@@ -23,8 +28,6 @@
                 <th>이름(닉네임)</th>
                 <th>학번</th>
                 <th>이메일</th>
-                <th>생년월일</th>
-                <th>재학상태</th>
                 <th>관리자</th>
                 <th>작업</th>
             </tr>
@@ -36,10 +39,11 @@
                 <td>{{ user.name }}</td>
                 <td>{{ user.student_id }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.birthdate }}</td>
-                <td>{{ user.status }}</td>
-                <td>{{ '예' if user.is_admin else '아니오' }}</td>
+                <td class="is-admin-cell">{{ '✔️ 관리자' if user.is_admin else '일반' }}</td>
                 <td>
+                    <button class="admin-toggle-btn {{ 'is-admin' if user.is_admin }}" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">
+                        {{ '권한 해제' if user.is_admin else '권한 부여' }}
+                    </button>
                     <button class="delete-btn" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">삭제</button>
                 </td>
             </tr>
@@ -48,24 +52,54 @@
     </table>
 
     <script>
+        // 삭제 버튼 기능 (이전과 동일)
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function() {
+                // ... (삭제 관련 코드는 생략, 이전과 동일합니다)
                 const userId = this.dataset.userId;
                 const userName = this.dataset.userName;
 
-                if (confirm(`정말로 '${userName}' 사용자를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) {
-                    fetch(`/admin/delete_user/${userId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
+                if (confirm(`정말로 '${userName}' 사용자를 삭제하시겠습니까?`)) {
+                    fetch(`/admin/delete_user/${userId}`, { method: 'POST' })
+                    .then(res => res.json())
                     .then(data => {
                         alert(data.message || data.error);
                         if (data.message) {
-                            // 성공적으로 삭제되면 화면에서 해당 줄을 제거
                             document.getElementById(`user-row-${userId}`).remove();
+                        }
+                    });
+                }
+            });
+        });
+
+        // ✅ [추가됨] 관리자 권한 변경 버튼 기능
+        document.querySelectorAll('.admin-toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const userName = this.dataset.userName;
+                const currentButton = this; // 현재 클릭된 버튼을 변수에 저장
+
+                if (confirm(`'${userName}' 사용자의 관리자 권한을 변경하시겠습니까?`)) {
+                    fetch(`/admin/toggle_admin/${userId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message || data.error);
+                        
+                        // 성공적으로 변경되었을 경우, 화면도 동적으로 업데이트
+                        if (data.message) {
+                            const userRow = document.getElementById(`user-row-${userId}`);
+                            const isAdminCell = userRow.querySelector('.is-admin-cell');
+                            
+                            // 서버로부터 받은 최신 isAdmin 상태를 기반으로 화면 업데이트
+                            if (data.isAdmin) {
+                                isAdminCell.textContent = '✔️ 관리자';
+                                currentButton.textContent = '권한 해제';
+                                currentButton.classList.add('is-admin');
+                            } else {
+                                isAdminCell.textContent = '일반';
+                                currentButton.textContent = '권한 부여';
+                                currentButton.classList.remove('is-admin');
+                            }
                         }
                     })
                     .catch(error => {

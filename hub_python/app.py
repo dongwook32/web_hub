@@ -262,22 +262,27 @@ def admin_page():
     return render_template('admin.html', users=all_users, nickname=nickname)
 
 
-# 사용자 삭제 API
-@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-def delete_user(user_id):
+@app.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
+def toggle_admin(user_id):
     # 관리자가 아니면 접근 거부
     if not session.get('is_admin'):
         return jsonify({"error": "권한이 없습니다."}), 403
 
-    user_to_delete = User.query.get(user_id)
-    if user_to_delete:
-        # 자기 자신은 삭제할 수 없도록 방지
-        if user_to_delete.id == session.get('user_id'):
-            return jsonify({"error": "자기 자신은 삭제할 수 없습니다."}), 400
+    user_to_toggle = User.query.get(user_id)
+    if user_to_toggle:
+        # 자기 자신의 권한은 변경할 수 없도록 방지
+        if user_to_toggle.id == session.get('user_id'):
+            return jsonify({"error": "자기 자신의 권한은 변경할 수 없습니다."}), 400
         
-        db.session.delete(user_to_delete)
+        # is_admin 값을 반대로 변경 (True -> False, False -> True)
+        user_to_toggle.is_admin = not user_to_toggle.is_admin
         db.session.commit()
-        return jsonify({"message": f"사용자 '{user_to_delete.name}' (이)가 삭제되었습니다."})
+        
+        new_status = "관리자" if user_to_toggle.is_admin else "일반 사용자"
+        return jsonify({
+            "message": f"'{user_to_toggle.name}' 님의 권한이 '{new_status}' (으)로 변경되었습니다.",
+            "isAdmin": user_to_toggle.is_admin # 변경된 현재 상태를 프론트엔드로 전달
+        })
     
     return jsonify({"error": "사용자를 찾을 수 없습니다."}), 404
 
