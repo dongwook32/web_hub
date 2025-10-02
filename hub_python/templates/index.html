@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KBU hub | 홈</title>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,15 +23,7 @@
       }
     }
   </script>
-  <style>
-    /* 협업자의 CSS 코드는 여기에 그대로 유지됩니다. */
-    html, body { font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; }
-    .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); }
-    .glass{ background: rgba(255,255,255,.7); backdrop-filter: blur(10px); }
-    /* ... (중간 CSS 생략) ... */
-    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,159,128,.55)} 70%{box-shadow:0 0 0 16px rgba(255,159,128,0)} 100%{box-shadow:0 0 0 0 rgba(255,159,128,0)} }
-  </style>
-</head>
+  </head>
 <body class="bg-cream text-ink">
   <div class="top-grad h-[160px] w-full absolute inset-0 -z-10 pointer-events-none"></div>
 
@@ -70,9 +65,64 @@
   </header>
 
   <section class="max-w-6xl mx-auto px-4 pt-8 pb-6 relative">
-    <div class="text-xs text-cocoa mt-2">클릭할 때마다 🎲가 굴러가요!</div>
+    <div class="floaters">
+      <div class="floater" style="left:10%; bottom:0; animation-duration:8s;">💬</div>
+      <div class="floater" style="left:22%; bottom:10px; animation-duration:9s; animation-delay:.5s;">🌟</div>
+      <div class="floater" style="left:78%; bottom:0; animation-duration:10s; animation-delay:1s;">🤝</div>
+      <div class="floater" style="left:60%; bottom:6px; animation-duration:8.6s; animation-delay:1.2s;">💡</div>
+      <div class="floater" style="left:35%; bottom:-6px; animation-duration:9.4s; animation-delay:.8s;">🎈</div>
+    </div>
+    <p class="text-center text-cocoa">같은 수업, 취미, 관심사를 가진 친구와 자연스럽게 연결될 수 있어요.</p>
+    <div class="rounded-xl2 md:rounded-3xl border border-peach/60 bg-white/70 p-8 md:p-12 shadow-card text-center mt-5 reveal relative overflow-hidden">
+      <div class="absolute -left-10 -top-10 w-40 h-40 rounded-full bg-lemon/60 blur-3xl"></div>
+      <div class="absolute -right-8 -bottom-10 w-40 h-40 rounded-full bg-mint/60 blur-3xl"></div>
+      <div class="text-5xl mb-3">🤝</div>
+      <h1 class="text-2xl md:text-4xl font-extrabold">세대를 잇는 소통의 장</h1>
+      <p class="mt-3 text-cocoa">선배의 경험과 후배의 열정을 이어주며<br class="hidden md:block">따뜻한 연결을 만드는 학과 게시판입니다.</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <a href="{{ url_for('boards_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">선후배와 수다 떨기 📌</a>
+        <button id="diceBtn" class="dice" type="button"><span class="die" id="die">1</span><span>오늘의 인연 만나기</span></button>
+      </div>
+      <div class="text-xs text-cocoa mt-2">클릭할 때마다 🎲가 굴러가요!</div>
+    </div>
   </section>
-  
+
+  <section class="max-w-6xl mx-auto px-4 py-6">
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+        <div class="text-2xl">📌</div>
+        <div class="mt-2 font-bold text-lg">게시판</div>
+        <p class="text-cocoa text-sm mt-1">카테고리/태그 정리, 검색·정렬, 북마크/신고.</p>
+        <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('boards_page') }}">바로가기 →</a>
+      </div>
+      <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+        <div class="text-2xl">🎲</div>
+        <div class="mt-2 font-bold text-lg">랜덤 매칭</div>
+        <p class="text-cocoa text-sm mt-1">같은 관심사 친구와 가벼운 대화부터.</p>
+        <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+      </div>
+      <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
+        <div class="text-2xl">💬</div>
+        <div class="mt-2 font-bold text-lg">실시간 채팅</div>
+        <p class="text-cocoa text-sm mt-1">읽음표시, 알림제어, 링크/이미지 미리보기.</p>
+        <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-4 py-6">
+    <div class="reveal rounded-xl2 border border-peach/50 bg-white p-6 md:p-8 shadow-card">
+      <div class="md:flex items-center gap-6">
+        <div class="text-3xl md:text-4xl font-extrabold">안전하고 따뜻한 커뮤니티</div>
+        <div class="grid grid-cols-3 gap-3 md:ml-auto mt-5 md:mt-0 text-center">
+          <div><div class="text-xl font-extrabold">신고/차단</div><div class="text-xs text-cocoa mt-1">악성 이용자 대응</div></div>
+          <div><div class="text-xl font-extrabold">익명 옵션</div><div class="text-xs text-cocoa mt-1">글/댓글 단위</div></div>
+          <div><div class="text-xl font-extrabold">투명 공지</div><div class="text-xs text-cocoa mt-1">가이드/정책 공개</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="max-w-6xl mx-auto px-4 py-10">
     <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
       <h3 class="text-2xl md:text-3xl font-extrabold">지금 합류하세요</h3>
@@ -85,48 +135,11 @@
   </section>
 
   <footer class="border-t border-peach/50">
-      </footer>
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-cocoa text-center">
+      © <span id="year"></span> KBU hub · All rights reserved.
+    </div>
+  </footer>
 
-  <script>
-    // 협업자의 JavaScript 코드는 여기에 그대로 유지됩니다.
-    document.addEventListener('DOMContentLoaded', function() {
-      const menuBtn = document.getElementById('menuBtn');
-      if (menuBtn) {
-        menuBtn.addEventListener('click', ()=>{
-          document.getElementById('mobileNav').classList.toggle('hidden');
-        });
-      }
-      
-      const year = document.getElementById('year');
-      if (year) {
-        year.textContent = new Date().getFullYear();
-      }
-      
-      const io = new IntersectionObserver((ents)=>ents.forEach(e=>{ 
-        if(e.isIntersecting) e.target.classList.add('reveal-on');
-      }), {threshold:.15});
-      document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-      
-      const die = document.getElementById('die');
-      const diceBtn = document.getElementById('diceBtn');
-      if (die && diceBtn) {
-        function roll(){ 
-          diceBtn.classList.add('shake'); 
-          let n=1; 
-          const timer=setInterval(()=>{ 
-            n = 1 + Math.floor(Math.random()*6); 
-            die.textContent=n; 
-          }, 60); 
-          setTimeout(()=>{ 
-            clearInterval(timer); 
-            diceBtn.classList.remove('shake'); 
-            // ✅ [수정됨] 주사위 클릭 시 이동할 링크 수정
-            window.location.href = "{{ url_for('chat_page') }}"; 
-          }, 700); 
-        }
-        diceBtn.addEventListener('click', roll);
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
