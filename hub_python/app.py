@@ -42,7 +42,13 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.String(20), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    nickname = db.Column(db.String(50), unique=True, nullable=False)
+    
+    # ✅ [변경됨] 닉네임 -> 이름으로 변경, 생년월일, 재학상태 추가
+    name = db.Column(db.String(50), nullable=False) 
+    nickname = db.Column(db.String(50), unique=True, nullable=False) # 닉네임은 중복확인을 위해 유지
+    birthdate = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(20), nullable=False)
+    
     email = db.Column(db.String(100), unique=True, nullable=False)
 
 class EmailVerification(db.Model):

@@ -2,61 +2,140 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>회원가입</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBU Hub 회원가입 - 정보 입력</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        p { font-size: 16px; color: #666; margin-bottom: 30px; }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+        }
+        #signup-btn {
+            background-color: #4e54c8;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #result-message { margin-top: 20px; font-weight: bold; height: 20px; }
+    </style>
 </head>
 <body>
-    <h1>회원가입</h1>
-    <!-- Flask에서 전달받은 이메일 주소를 표시합니다. -->
-    <p><strong>{{ user_email }}</strong> 계정으로 가입을 진행합니다.</p>
+    <div class="container">
+        <h1>회원정보 입력</h1>
+        <p><strong>{{ user_email }}</strong><br>계정으로 가입을 진행합니다.</p>
 
-    <!-- Flask에서 전달받은 토큰 값을 숨겨진 필드에 저장합니다. -->
-    <input type="hidden" id="verification-token" value="{{ token }}">
+        <input type="hidden" id="verification-token" value="{{ token }}">
 
-    <!-- 학번 입력 -->
-    <label for="student-id">학번:</label><br>
-    <input type="text" id="student-id" placeholder="학번을 입력하세요"><br><br>
-
-    <!-- 닉네임 입력 -->
-    <label for="nickname">닉네임:</label><br>
-    <input type="text" id="nickname" placeholder="사이트에서 사용할 닉네임"><br><br>
-
-    <!-- 비밀번호 입력 -->
-    <label for="password">비밀번호:</label><br>
-    <input type="password" id="password" placeholder="비밀번호"><br><br>
-
-    <!-- 서버로부터 받은 결과를 표시할 공간 -->
-    <p id="result-message"></p>
-
-    <button id="signup-btn">가입 완료</button>
+        <div class="form-group">
+            <label for="student-id">학번</label>
+            <input type="text" id="student-id" placeholder="학번을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" placeholder="실명을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="birthdate">생년월일</label>
+            <input type="date" id="birthdate">
+        </div>
+        <div class="form-group">
+            <label for="status">재학 상태</label>
+            <select id="status">
+                <option value="">선택하세요</option>
+                <option value="신입생">신입생</option>
+                <option value="재학생">재학생</option>
+                <option value="편입생">편입생</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" placeholder="비밀번호">
+        </div>
+        <div class="form-group">
+            <label for="password-confirm">비밀번호 확인</label>
+            <input type="password" id="password-confirm" placeholder="비밀번호를 한번 더 입력하세요">
+        </div>
+        
+        <p id="result-message"></p>
+        <button id="signup-btn">가입 완료</button>
+    </div>
 
     <script>
-        // 버튼과 입력 필드 요소 가져오기
         const signupBtn = document.getElementById('signup-btn');
         const studentIdInput = document.getElementById('student-id');
-        const nicknameInput = document.getElementById('nickname');
+        const nameInput = document.getElementById('name');
+        const birthdateInput = document.getElementById('birthdate');
+        const statusInput = document.getElementById('status');
         const passwordInput = document.getElementById('password');
-        const tokenInput = document.getElementById('verification-token'); // 숨겨진 토큰 필드
+        const passwordConfirmInput = document.getElementById('password-confirm');
+        const tokenInput = document.getElementById('verification-token');
         const resultMessage = document.getElementById('result-message');
 
-        // 가입 완료 버튼 클릭 이벤트 처리
         signupBtn.addEventListener('click', function() {
-            // 사용자가 입력한 값들
             const studentId = studentIdInput.value;
-            const nickname = nicknameInput.value;
+            const name = nameInput.value;
+            const birthdate = birthdateInput.value;
+            const status = statusInput.value;
             const password = passwordInput.value;
-            const token = tokenInput.value; // 숨겨진 필드에서 토큰 값 가져오기
+            const passwordConfirm = passwordConfirmInput.value;
+            const token = tokenInput.value;
 
-            // [수정됨] 백엔드의 /signup API로 데이터 전송
+            // ✅ [추가됨] 비밀번호 일치 여부 확인
+            if (password !== passwordConfirm) {
+                resultMessage.textContent = '오류: 비밀번호가 일치하지 않습니다.';
+                resultMessage.style.color = 'red';
+                return; // 함수 종료
+            }
+
+            // ✅ [추가됨] 모든 필드가 채워졌는지 확인
+            if (!studentId || !name || !birthdate || !status || !password) {
+                resultMessage.textContent = '오류: 모든 항목을 입력해주세요.';
+                resultMessage.style.color = 'red';
+                return;
+            }
+
             fetch("{{ url_for('signup') }}", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     student_id: studentId,
-                    nickname: nickname,
+                    name: name,
+                    birthdate: birthdate,
+                    status: status,
                     password: password,
-                    token: token // 인증 성공을 증명하는 토큰
+                    token: token
                 })
             })
             .then(response => response.json())
@@ -64,11 +143,10 @@
                 if (data.message) {
                     resultMessage.textContent = data.message;
                     resultMessage.style.color = 'blue';
-                    // [개선됨] 성공 시 2초 후 로그인 페이지로 이동
                     alert(data.message);
-                    setTimeout(function() {
+                    setTimeout(() => {
                         window.location.href = "{{ url_for('login_page') }}";
-                    }, 2000);
+                    }, 1000);
                 } else {
                     resultMessage.textContent = '오류: ' + data.error;
                     resultMessage.style.color = 'red';
@@ -77,6 +155,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 resultMessage.textContent = '서버 통신 오류가 발생했습니다.';
+                resultMessage.style.color = 'red';
             });
         });
     </script>
