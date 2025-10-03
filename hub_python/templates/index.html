@@ -34,21 +34,17 @@
     padding: 10px 16px;
     border-radius: 999px;
     font-weight: 700;
-    /* ✅ [수정] 모든 글자색을 흰색으로 변경 */
-    color: #000000; 
+    color: #FFFFFF; /* 모든 글자색을 흰색으로 통일 */
     display: flex;
     align-items: center;
     gap: 8px;
     transition: color .3s ease, transform .18s ease;
 }
 
+/* ✅ [수정] 마우스를 올렸을 때 글자색이 흰색으로 유지되도록 color 속성 추가 */
 .nav-item:hover {
     transform: translateY(-2px);
-}
-
-.nav-item.active {
-    /* ✅ [수정] color 속성을 제거하여 부모 스타일을 따르게 함 */
-    /* color: white; <-- 이 줄을 삭제하거나 주석 처리 */
+    color: #FFFFFF; /* 마우스 호버 시 글자색 흰색으로 유지 */
 }
     
     /* ✅ [수정됨] 애니메이션 bubble 스타일 */
@@ -200,16 +196,17 @@
     </div>
   </div>
 </section>
-    <section class="max-w-6xl mx-auto px-4 py-10">
-      <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
-          <h3 class="text-2xl md:text-3xl font-extrabold">지금 합류하세요</h3>
-          <p class="mt-2 text-cocoa">크림/피치 감성 + 플레이풀 인터랙션.</p>
-          <div class="mt-6 flex justify-center gap-3">
-              <a href="{{ url_for('signup_terms_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">회원가입 ✨</a>
-              <a href="{{ url_for('main_page') }}" class="px-5 py-3 rounded-bubble border border-peach/70 hover:shadow-soft transition">서비스 소개</a>
-          </div>
+<section class="max-w-6xl mx-auto px-4 py-10">
+    <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
+      <div class="text-4xl">🚀</div>
+      <h3 class="text-2xl md:text-3xl font-extrabold mt-2">KBU Hub, 지금 시작해보세요</h3>
+      <p class="mt-2 text-cocoa">선배, 동기, 후배와 교류하며 새로운 기회를 발견하고,<br>따뜻한 커뮤니티의 일원이 되어보세요.</p>
+      <div class="mt-6 flex justify-center gap-3">
+        <a href="{{ url_for('signup_terms_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">시작하기 ✨</a>
+        <a href="{{ url_for('main_page') }}" class="px-5 py-3 rounded-bubble border border-peach/70 hover:shadow-soft transition">서비스 둘러보기</a>
       </div>
-    </section>
+    </div>
+</section>
   </main>
 
   <footer class="border-t border-peach/50">
