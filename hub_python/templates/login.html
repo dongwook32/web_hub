@@ -42,8 +42,26 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            margin-top: 10px;
         }
         #result-message { height: 20px; margin-top: 20px; font-weight: bold; }
+        
+        /* ✅ [추가됨] 비밀번호 보기 기능을 위한 스타일 */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .password-wrapper input {
+            padding-right: 45px; /* 아이콘 공간 확보 */
+        }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +73,10 @@
         </div>
         <div class="form-group">
             <label for="password">비밀번호</label>
-            <input type="password" id="password" placeholder="비밀번호">
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="비밀번호">
+                <span class="toggle-password" id="toggle-password">👁️</span>
+            </div>
         </div>
         <p id="result-message"></p>
         <button id="login-btn">로그인</button>
@@ -66,6 +87,16 @@
         const studentIdInput = document.getElementById('student-id');
         const passwordInput = document.getElementById('password');
         const resultMessage = document.getElementById('result-message');
+        
+        // ✅ [추가됨] 비밀번호 보기 아이콘 요소 가져오기
+        const togglePassword = document.getElementById('toggle-password');
+
+        // ✅ [추가됨] 비밀번호 아이콘 클릭 이벤트
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
 
         loginBtn.addEventListener('click', function() {
             const studentId = studentIdInput.value;
@@ -82,13 +113,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    // 로그인 성공 시
                     resultMessage.textContent = data.message;
                     resultMessage.style.color = 'blue';
-                    // ✅ [수정됨] 404 오류의 원인. 메인 페이지로 이동하도록 수정.
                     window.location.href = "{{ url_for('main_page') }}";
                 } else {
-                    // 로그인 실패 시
                     resultMessage.textContent = '오류: ' + data.error;
                     resultMessage.style.color = 'red';
                 }
