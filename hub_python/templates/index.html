@@ -28,37 +28,31 @@
     .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); }
     .glass{ background: rgba(255,255,255,.7); backdrop-filter: blur(10px); }
     .nav-pill{ position:relative; display:flex; gap:6px; padding:6px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.6)); border:1px solid rgba(255,159,128,.45); }
-.nav-item {
-    position: relative;
-    z-index: 1;
-    padding: 10px 16px;
-    border-radius: 999px;
-    font-weight: 700;
-    color: #FFFFFF; /* 모든 글자색을 흰색으로 통일 */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: color .3s ease, transform .18s ease;
-}
-
-/* ✅ [수정] 마우스를 올렸을 때 글자색이 흰색으로 유지되도록 color 속성 추가 */
-.nav-item:hover {
-    transform: translateY(-2px);
-    color: #FFFFFF; /* 마우스 호버 시 글자색 흰색으로 유지 */
-}
     
-    /* ✅ [수정됨] 애니메이션 bubble 스타일 */
-    .nav-bubble {
-      position: absolute;
-      z-index: 0;
-      top: 6px;
-      left: 0;
-      background: linear-gradient(135deg, #FF9F80, #FFC8B2);
-      border-radius: 999px;
-      box-shadow: 0 4px 15px rgba(255, 159, 128, 0.3);
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    .nav-item {
+        position: relative;
+        z-index: 1;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        color: #374151; 
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color .3s ease, transform .18s ease;
+        background: none;
+        border: none;
+        cursor: pointer;
     }
-    
+    .nav-item:hover {
+        transform: translateY(-2px);
+        color: #FFFFFF; 
+    }
+    .nav-item.active {
+        color: white; 
+    }
+
+    .nav-bubble { position: absolute; z-index: 0; top: 6px; left: 0; background: linear-gradient(135deg, #FF9F80, #FFC8B2); border-radius: 999px; box-shadow: 0 4px 15px rgba(255, 159, 128, 0.3); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .py-2.active { background: linear-gradient(135deg, #FF9F80, #FFC8B2); color: white; font-weight: 700; border-radius: 8px; }
     .tilt{ transition: transform .2s ease, box-shadow .2s ease; }
     .tilt:hover{ transform: translateY(-2px) rotate(.2deg); box-shadow: 0 18px 40px rgba(255,159,128,.25); }
@@ -71,16 +65,14 @@
     .dice:hover{ transform: translateY(-1px); box-shadow: 0 16px 36px rgba(255,159,128,.36); }
     .die{ width:22px; height:22px; border-radius:6px; background:white; display:grid; place-items:center; color:#FF9F80; font-weight:900; box-shadow: inset 0 0 0 2px rgba(255,159,128,.7); }
     .shake{ animation: shake .6s cubic-bezier(.36,.07,.19,.97) both; }
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
     .glow{ box-shadow: 0 0 0 0 rgba(255,159,128,.6); animation: pulse 2.2s ease-in-out infinite; }
     @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,159,128,.55)} 70%{box-shadow:0 0 0 16px rgba(255,159,128,0)} 100%{box-shadow:0 0 0 0 rgba(255,159,128,0)} }
   </style>
 </head>
 <body class="bg-cream text-ink">
   
-  <div class="top-grad h-[160px] w-full absolute inset-0 -z-10 pointer-events-none"></div>
+  <div class="top-grad h-[160px] w-full absolute inset-0 -z-10 pointer-events-none;"></div>
 
   <header class="sticky top-0 z-50 border-b border-peach/40 glass">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
@@ -91,13 +83,13 @@
       <nav class="ml-auto hidden md:flex">
         <div id="navPill" class="nav-pill">
           <a class="nav-item active" href="{{ url_for('main_page') }}">서비스 소개</a>
-          <a class="nav-item" href="{{ url_for('chat_page') }}">랜덤 매칭</a>
-          <a class="nav-item" href="{{ url_for('boards_page') }}">게시판</a>
-          <a class="nav-item" href="{{ url_for('mypage_page') }}">마이페이지</a>
+          <a class="nav-item" href="#">랜덤 매칭</a>
+          <a class="nav-item" href="#">게시판</a>
+          <a class="nav-item" href="#">마이페이지</a>
           {% if nickname %}
-            <a class="nav-item" href="{{ url_for('logout') }}">{{ nickname }}님 로그아웃</a>
+            <button onclick="location.href='{{ url_for('logout') }}'" class="nav-item">로그아웃</button>
           {% else %}
-            <a class="nav-item" href="{{ url_for('login_page') }}">로그인</a>
+            <button onclick="location.href='{{ url_for('login_page') }}'" class="nav-item">로그인</button>
           {% endif %}
         </div>
       </nav>
@@ -106,13 +98,13 @@
     <div id="mobileNav" class="hidden md:hidden px-4 pb-3 border-t border-peach/40 bg-white/70">
       <div class="flex flex-col gap-1 py-2 text-sm">
         <a class="py-2 active" href="{{ url_for('main_page') }}">서비스 소개</a>
-        <a class="py-2" href="{{ url_for('chat_page') }}">랜덤 매칭</a>
-        <a class="py-2" href="{{ url_for('boards_page') }}">게시판</a>
-        <a class="py-2" href="{{ url_for('mypage_page') }}">마이페이지</a>
+        <a class="py-2" href="#">랜덤 매칭</a>
+        <a class="py-2" href="#">게시판</a>
+        <a class="py-2" href="#">마이페이지</a>
         {% if nickname %}
-            <a class="py-2" href="{{ url_for('logout') }}">{{ nickname }}님 로그아웃</a>
+            <button onclick="location.href='{{ url_for('logout') }}'" class="py-2 text-left w-full">로그아웃</button>
         {% else %}
-            <a class="py-2" href="{{ url_for('login_page') }}">로그인</a>
+            <button onclick="location.href='{{ url_for('login_page') }}'" class="py-2 text-left w-full">로그인</button>
         {% endif %}
       </div>
     </div>
@@ -135,7 +127,7 @@
           <h1 class="text-2xl md:text-4xl font-extrabold">세대를 잇는 소통의 장</h1>
           <p class="mt-3 text-cocoa">선배의 경험과 후배의 열정을 이어주며<br class="hidden md:block">따뜻한 연결을 만드는 학과 게시판입니다.</p>
           <div class="mt-6 flex flex-wrap justify-center gap-3">
-              <a href="{{ url_for('boards_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">선후배와 수다 떨기 📌</a>
+              <a href="#" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">선후배와 수다 떨기 📌</a>
               <button id="diceBtn" class="dice" type="button"><span class="die" id="die">1</span><span>오늘의 인연 만나기</span></button>
           </div>
           <div class="text-xs text-cocoa mt-2">클릭할 때마다 🎲가 굴러가요!</div>
@@ -147,66 +139,66 @@
               <div class="text-2xl">📌</div>
               <div class="mt-2 font-bold text-lg">게시판</div>
               <p class="text-cocoa text-sm mt-1">카테고리/태그 정리, 검색·정렬, 북마크/신고.</p>
-              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('boards_page') }}">바로가기 →</a>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="#">바로가기 →</a>
           </div>
           <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
               <div class="text-2xl">🎲</div>
               <div class="mt-2 font-bold text-lg">랜덤 매칭</div>
               <p class="text-cocoa text-sm mt-1">같은 관심사 친구와 가벼운 대화부터.</p>
-              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="#">바로가기 →</a>
           </div>
           <div class="reveal rounded-xl2 border border-peach/50 bg-white hover:shadow-soft p-6 tilt">
               <div class="text-2xl">💬</div>
               <div class="mt-2 font-bold text-lg">실시간 채팅</div>
               <p class="text-cocoa text-sm mt-1">읽음표시, 알림제어, 링크/이미지 미리보기.</p>
-              <a class="inline-block mt-3 text-peachDeep font-semibold" href="{{ url_for('chat_page') }}">바로가기 →</a>
+              <a class="inline-block mt-3 text-peachDeep font-semibold" href="#">바로가기 →</a>
           </div>
       </div>
     </section>
-<section class="max-w-6xl mx-auto px-4 py-6">
-  <div class="reveal rounded-xl2 border border-peach/50 bg-white p-6 md:p-8 shadow-card">
-    <div class="grid md:grid-cols-2 items-center gap-8">
-      <div class="text-left">
-        <h3 class="text-3xl md:text-4xl font-extrabold">안전하고<br>따뜻한 커뮤니티</h3>
-        <p class="mt-4 text-cocoa">모두가 안심하고 소통할 수 있도록<br>KBU Hub는 세 가지 원칙을 지킵니다.</p>
-      </div>
-      <div class="grid grid-cols-1 gap-4">
-        <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
-          <div class="text-3xl">🛡️</div>
-          <div>
-            <div class="font-bold">신고/차단 기능</div>
-            <div class="text-sm text-cocoa">악성 이용자에 대한 빠른 대응</div>
+    <section class="max-w-6xl mx-auto px-4 py-6">
+      <div class="reveal rounded-xl2 border border-peach/50 bg-white p-6 md:p-8 shadow-card">
+        <div class="grid md:grid-cols-2 items-center gap-8">
+          <div class="text-left">
+            <h3 class="text-3xl md:text-4xl font-extrabold">안전하고<br>따뜻한 커뮤니티</h3>
+            <p class="mt-4 text-cocoa">모두가 안심하고 소통할 수 있도록<br>KBU Hub는 세 가지 원칙을 지킵니다.</p>
+          </div>
+          <div class="grid grid-cols-1 gap-4">
+            <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
+              <div class="text-3xl">🛡️</div>
+              <div>
+                <div class="font-bold">신고/차단 기능</div>
+                <div class="text-sm text-cocoa">악성 이용자에 대한 빠른 대응</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
+              <div class="text-3xl">👻</div>
+              <div>
+                <div class="font-bold">익명 옵션 제공</div>
+                <div class="text-sm text-cocoa">글과 댓글 단위로 선택 가능</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
+              <div class="text-3xl">📢</div>
+              <div>
+                <div class="font-bold">투명한 정책 공지</div>
+                <div class="text-sm text-cocoa">가이드라인 및 운영 정책 공개</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
-          <div class="text-3xl">👻</div>
-          <div>
-            <div class="font-bold">익명 옵션 제공</div>
-            <div class="text-sm text-cocoa">글과 댓글 단위로 선택 가능</div>
-          </div>
-        </div>
-        <div class="flex items-center gap-4 bg-cream p-4 rounded-xl border border-peach/50">
-          <div class="text-3xl">📢</div>
-          <div>
-            <div class="font-bold">투명한 정책 공지</div>
-            <div class="text-sm text-cocoa">가이드라인 및 운영 정책 공개</div>
-          </div>
+      </div>
+    </section>
+    <section class="max-w-6xl mx-auto px-4 py-10">
+      <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
+        <div class="text-4xl">🚀</div>
+        <h3 class="text-2xl md:text-3xl font-extrabold mt-2">KBU Hub, 지금 시작해보세요</h3>
+        <p class="mt-2 text-cocoa">선배, 동기, 후배와 교류하며 새로운 기회를 발견하고,<br>따뜻한 커뮤니티의 일원이 되어보세요.</p>
+        <div class="mt-6 flex justify-center gap-3">
+          <a href="{{ url_for('signup_terms_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">시작하기 ✨</a>
+          <a href="{{ url_for('main_page') }}" class="px-5 py-3 rounded-bubble border border-peach/70 hover:shadow-soft transition">서비스 둘러보기</a>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-<section class="max-w-6xl mx-auto px-4 py-10">
-    <div class="reveal rounded-xl2 border border-peach/60 bg-white p-6 md:p-8 text-center">
-      <div class="text-4xl">🚀</div>
-      <h3 class="text-2xl md:text-3xl font-extrabold mt-2">KBU Hub, 지금 시작해보세요</h3>
-      <p class="mt-2 text-cocoa">선배, 동기, 후배와 교류하며 새로운 기회를 발견하고,<br>따뜻한 커뮤니티의 일원이 되어보세요.</p>
-      <div class="mt-6 flex justify-center gap-3">
-        <a href="{{ url_for('signup_terms_page') }}" class="px-5 py-3 rounded-bubble bg-peachDeep text-white font-extrabold glow">시작하기 ✨</a>
-        <a href="{{ url_for('main_page') }}" class="px-5 py-3 rounded-bubble border border-peach/70 hover:shadow-soft transition">서비스 둘러보기</a>
-      </div>
-    </div>
-</section>
+    </section>
   </main>
 
   <footer class="border-t border-peach/50">
@@ -238,33 +230,30 @@
           setTimeout(()=>{ 
             clearInterval(timer); 
             diceBtn.classList.remove('shake'); 
-            window.location.href = "{{ url_for('chat_page') }}"; 
+            window.location.href = "#"; // 임시 링크
           }, 700); 
         }
         diceBtn.addEventListener('click', roll);
       }
       
-      // ✅ [추가됨] 내비게이션 bubble 애니메이션 기능
       const navPill = document.getElementById('navPill');
       if (navPill) {
-        const navItems = navPill.querySelectorAll('.nav-item');
-        // 버블 요소를 동적으로 생성해서 navPill의 맨 앞에 추가
+        const navItems = navPill.querySelectorAll('a.nav-item, button.nav-item');
         const bubble = document.createElement('div');
         bubble.classList.add('nav-bubble');
         navPill.prepend(bubble);
 
         function moveBubble(target) {
+            if (!target) return;
             const coords = target.getBoundingClientRect();
             const parentCoords = navPill.getBoundingClientRect();
             bubble.style.width = `${coords.width}px`;
             bubble.style.height = `${coords.height}px`;
-            // transform 속성을 사용해 부드럽게 이동
             bubble.style.transform = `translateX(${coords.left - parentCoords.left}px)`;
         }
 
-        const activeItem = navPill.querySelector('.nav-item.active');
+        const activeItem = navPill.querySelector('.active');
         if (activeItem) {
-            // 페이지 로드 시 잠시 후 bubble을 active 아이템 위치로 이동
             setTimeout(() => moveBubble(activeItem), 50);
         }
 
@@ -273,10 +262,8 @@
         });
 
         navPill.addEventListener('mouseleave', () => {
-            const activeItem = navPill.querySelector('.nav-item.active');
-            if (activeItem) {
-                moveBubble(activeItem);
-            }
+            const activeItem = navPill.querySelector('.active');
+            moveBubble(activeItem);
         });
       }
     });
