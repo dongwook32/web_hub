@@ -11,13 +11,13 @@ from whitenoise import WhiteNoise
 
 # --- 1. 초기 설정 및 환경 구성 ---
 
-# ⭐️ 핵심 수정 #1: 프로젝트의 절대 경로를 계산하여 안정성을 극대화합니다.
+# ⭐️ 핵심 수정: 프로젝트의 절대 경로를 계산하여 안정성을 극대화합니다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Flask 앱 인스턴스 생성
 app = Flask(__name__, static_folder=None, template_folder=os.path.join(BASE_DIR, 'templates'))
 
-# ⭐️ 핵심 수정 #2: WhiteNoise에 static 폴더의 '절대 경로'를 명확하게 알려줍니다.
+# ⭐️ 핵심 수정: WhiteNoise에 static 폴더의 '절대 경로'를 명확하게 알려줍니다.
 # 이렇게 하면 서버가 어떤 위치에서 실행되더라도 항상 정확한 static 폴더를 찾아 내용을 읽을 수 있습니다.
 static_folder_root = os.path.join(BASE_DIR, 'static')
 app.wsgi_app = WhiteNoise(app.wsgi_app, root=static_folder_root, prefix='/static/')
@@ -78,7 +78,10 @@ class Post(db.Model):
     author = db.relationship('User', backref='posts')
     board = db.relationship('Board', backref='posts')
     def to_dict(self):
-        return { "id": self.id, "title": self.title, "content": self.content, "author_nickname": self.author.nickname, "created_at": self.created_at.isoformat(), "views": self.views, "likes": Like.query.filter_by(post_id=self.id).count(), "comments_count": Comment.query.filter_by(post_id=self.id).count() }
+        # 좋아요와 댓글 수를 세는 쿼리가 관계 로드 후 수행되도록 수정
+        likes_count = db.session.query(func.count(Like.user_id)).filter(Like.post_id == self.id).scalar()
+        comments_count = db.session.query(func.count(Comment.id)).filter(Comment.post_id == self.id).scalar()
+        return { "id": self.id, "title": self.title, "content": self.content, "author_nickname": self.author.nickname, "created_at": self.created_at.isoformat(), "views": self.views, "likes": likes_count, "comments_count": comments_count }
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
