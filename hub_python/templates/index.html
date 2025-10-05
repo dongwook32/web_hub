@@ -28,42 +28,28 @@
     .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); }
     .glass{ background: rgba(255,255,255,.7); backdrop-filter: blur(10px); }
     
-    /* ✅ [수정됨] 최종 내비게이션 바 스타일 */
-    .nav-pill { 
-        position:relative; 
-        display:flex; 
-        gap:6px; 
-        padding:6px; 
-        border-radius:999px; 
-        background:transparent; /* 배경 투명 */
-        border:none; /* 테두리 없음 */
+    /* ✅ [수정됨] 클릭 버블 기능에 맞는 새로운 내비게이션 스타일 */
+    .nav-container {
+        position: relative; /* 버블의 기준점 */
+        display: flex;
+        gap: 6px;
+        padding: 6px;
     }
-
     .nav-item {
         position: relative;
-        z-index: 1;
+        z-index: 1; /* 버블보다 위에 있도록 */
         padding: 10px 16px;
         border-radius: 999px;
         font-weight: 700;
         color: #374151; /* 평소 글자색: 검은색 */
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: color .3s ease, transform .18s ease;
+        transition: color .3s ease;
         background: none;
         border: none;
         cursor: pointer;
     }
-
-    .nav-item:hover {
-        transform: translateY(-2px);
-        color: #FFFFFF; /* 마우스 올렸을 때: 흰색 */
+    .nav-item.is-active {
+        color: white; /* 클릭되었을 때(활성화) 글자색: 흰색 */
     }
-
-    .nav-item.active {
-        color: white; /* 활성화된 메뉴는 항상 흰색 */
-    }
-
     .nav-bubble {
         position: absolute;
         z-index: 0;
@@ -72,9 +58,11 @@
         background: linear-gradient(135deg, #FF9F80, #FFC8B2);
         border-radius: 999px;
         box-shadow: 0 4px 15px rgba(255, 159, 128, 0.3);
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        opacity: 0; /* 처음에는 버블 숨기기 */
     }
 
+    /* (이하 다른 스타일은 이전과 동일) */
     .py-2.active { background: #FFFAF5; color: #FF7B54; font-weight: 700; border-radius: 8px; }
     .tilt{ transition: transform .2s ease, box-shadow .2s ease; }
     .tilt:hover{ transform: translateY(-2px) rotate(.2deg); box-shadow: 0 18px 40px rgba(255,159,128,.25); }
@@ -103,8 +91,9 @@
         <span>hub</span>
       </a>
       <nav class="ml-auto hidden md:flex">
-        <div id="navPill" class="nav-pill">
-          <a class="nav-item active" href="{{ url_for('main_page') }}">서비스 소개</a>
+        <div id="navContainer" class="nav-container">
+          <div id="navBubble" class="nav-bubble"></div>
+          <a class="nav-item" href="{{ url_for('main_page') }}">서비스 소개</a>
           <a class="nav-item" href="#">랜덤 매칭</a>
           <a class="nav-item" href="#">게시판</a>
           <a class="nav-item" href="#">마이페이지</a>
@@ -258,35 +247,35 @@
         diceBtn.addEventListener('click', roll);
       }
       
-      // ✅ [수정됨] 최종 내비게이션 bubble 애니메이션 기능
-      const navPill = document.getElementById('navPill');
-      if (navPill) {
-        const navItems = navPill.querySelectorAll('a.nav-item, button.nav-item');
-        const bubble = document.createElement('div');
-        bubble.classList.add('nav-bubble');
-        navPill.prepend(bubble);
+      // ✅ [수정됨] 최종 클릭 버블 애니메이션 기능
+      const navContainer = document.getElementById('navContainer');
+      if (navContainer) {
+        const navBubble = document.getElementById('navBubble');
+        const navItems = navContainer.querySelectorAll('.nav-item');
 
         function moveBubble(target) {
             if (!target) return;
-            const coords = target.getBoundingClientRect();
-            const parentCoords = navPill.getBoundingClientRect();
-            bubble.style.width = `${coords.width}px`;
-            bubble.style.height = `${coords.height}px`;
-            bubble.style.transform = `translateX(${coords.left - parentCoords.left}px)`;
-        }
+            const targetLeft = target.offsetLeft;
+            const targetWidth = target.offsetWidth;
 
-        const activeItem = navPill.querySelector('.nav-item.active');
-        if (activeItem) {
-            setTimeout(() => moveBubble(activeItem), 50);
+            navBubble.style.width = `${targetWidth}px`;
+            navBubble.style.transform = `translateX(${targetLeft}px)`;
+            navBubble.style.opacity = '1';
+        }
+        
+        const defaultActiveItem = navItems[0];
+        if (defaultActiveItem) {
+            defaultActiveItem.classList.add('is-active');
+            setTimeout(() => moveBubble(defaultActiveItem), 50);
         }
 
         navItems.forEach(item => {
-            item.addEventListener('mouseenter', () => moveBubble(item));
-        });
-
-        navPill.addEventListener('mouseleave', () => {
-            const activeItem = navPill.querySelector('.nav-item.active');
-            moveBubble(activeItem);
+            item.addEventListener('click', function(event) {
+                // a 태그의 기본 이동 동작을 막지 않습니다.
+                navItems.forEach(i => i.classList.remove('is-active'));
+                this.classList.add('is-active');
+                moveBubble(this);
+            });
         });
       }
     });
