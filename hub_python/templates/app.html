@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KBU hub | 대학생 익명 커뮤니티</title>
   
-  <!-- ✅ 경로 수정: 모든 정적 파일(CSS, JS, 이미지 등) 경로는 /static/ 으로 시작해야 합니다. -->
+  <!-- ✅ 경로 일치: logo.png는 static 폴더 바로 아래에 있으므로 그대로 둡니다. -->
   <link rel="icon" href="/static/logo.png">
   
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- ✅ 경로 수정 -->
-  <link rel="stylesheet" href="/static/layout.css">
-  <link rel="stylesheet" href="/static/nav.css">
-  <link rel="stylesheet" href="/static/style.css">
+  <!-- ✅ 최종 경로 수정: CSS 파일들은 static/css/ 폴더 안에 있습니다. -->
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/nav.css">
+  <link rel="stylesheet" href="/static/css/style.css">
 
   <script>
     // Tailwind 설정은 그대로 둡니다.
@@ -32,62 +32,46 @@
   </script>
 </head>
 <body class="bg-cream text-ink app-layout">
-  <!-- 고정 배경 (layout.css에서 관리) -->
   <div class="app-background"></div>
 
-  <!-- 고정 헤더 -->
   <header class="app-header">
     <div class="container mx-auto px-4 flex items-center h-full">
       <a href="/" onclick="event.preventDefault(); window.spaRouter.navigateTo('/')" class="flex items-center gap-2">
-        <img src="/static/logo.png" alt="KBU hub 로고" class="h-8 w-8"> <!-- ✅ 경로 수정 -->
+        <img src="/static/logo.png" alt="KBU hub 로고" class="h-8 w-8">
         <span class="font-bold text-xl text-ink">KBU hub</span>
       </a>
       <nav class="ml-auto hidden md:flex">
-        <div class="nav-pill">
-            <a class="nav-item" href="/index" onclick="event.preventDefault(); window.spaRouter.navigateTo('/')">서비스 소개</a>
-            <a class="nav-item" href="/chat" onclick="event.preventDefault(); window.spaRouter.navigateTo('/chat')">랜덤 매칭</a>
-            <a class="nav-item" href="/boards" onclick="event.preventDefault(); window.spaRouter.navigateTo('/boards')">게시판</a>
-            <a class="nav-item" href="/mypage" onclick="event.preventDefault(); window.spaRouter.navigateTo('/mypage')">마이페이지</a>
-            <!-- 로그인/로그아웃 버튼은 JS가 동적으로 처리할 예정 -->
-            <div id="auth-nav-links">
-              <a class="nav-item" href="/login" onclick="event.preventDefault(); window.spaRouter.navigateTo('/login')">로그인</a>
-            </div>
+        <div class="nav-pill" id="main-nav-links">
+            <!-- 네비게이션 링크들은 navigation.js가 동적으로 관리할 수 있습니다. -->
+        </div>
+        <div id="auth-nav-links" class="nav-pill">
+          <a class="nav-item" href="/login" onclick="event.preventDefault(); window.spaRouter.navigateTo('/login')">로그인</a>
         </div>
       </nav>
       <button id="menuBtn" class="md:hidden ml-auto p-2 rounded-full">☰</button>
     </div>
   </header>
   
-  <!-- 동적 콘텐츠가 삽입될 메인 영역 -->
   <main id="main-content" class="app-content container mx-auto px-4 py-8">
     <!-- 로딩 중... -->
   </main>
 
-  <!-- 푸터 -->
   <footer class="app-footer text-center p-4 text-cocoa text-sm">
     <div>© <span id="year"></span> KBU hub · All rights reserved.</div>
   </footer>
 
-  <!-- SPA를 위한 핵심 스크립트들 -->
-  <!-- ✅ 경로 수정 -->
-  <script src="/static/preload.js"></script>
-  <script src="/static/router.js"></script>
-  <script src="/static/navigation.js"></script>
+  <!-- ✅ 최종 경로 수정: JS 파일들은 static/js/ 폴더 안에 있습니다. -->
+  <script src="/static/js/preload.js"></script>
+  <script src="/static/js/router.js"></script>
+  <script src="/static/js/navigation.js"></script>
+  <script src="/static/js/script.js"></script>
   
-  <!-- 초기화 및 공통 스크립트 -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // 년도 설정
       document.getElementById('year').textContent = new Date().getFullYear();
-
-      // 모바일 메뉴 토글
-      const menuBtn = document.getElementById('menuBtn');
-      // 모바일 네비게이션은 필요 시 동적으로 생성하거나 다른 파일에서 관리할 수 있습니다.
-      
       console.log('🎉 앱 초기화 완료');
-
-      // ✨ 인증 상태 확인 API 호출
-      // 페이지 로드 시 가장 먼저 로그인 상태를 확인하여 네비게이션 메뉴를 업데이트합니다.
+      
+      // 로그인 상태를 확인하여 네비게이션 메뉴를 동적으로 업데이트합니다.
       fetch('/api/auth/status')
         .then(response => response.json())
         .then(data => {
@@ -97,16 +81,14 @@
               <span class="nav-item !bg-transparent">환영합니다, ${data.user.nickname}님!</span>
               <a href="#" id="logout-button" class="nav-item">로그아웃</a>
             `;
-            // 로그아웃 버튼에 이벤트 리스너 추가
             document.getElementById('logout-button').addEventListener('click', (e) => {
               e.preventDefault();
-              fetch('/api/logout').then(() => window.location.reload());
+              fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
             });
-          } else {
-            // 로그인 되어 있지 않으면 기본 '로그인' 버튼이 보이므로 그대로 둡니다.
           }
         });
     });
   </script>
 </body>
 </html>
+
