@@ -62,7 +62,6 @@
         opacity: 0; /* 처음에는 버블 숨기기 */
     }
 
-    /* (이하 다른 스타일은 이전과 동일) */
     .py-2.active { background: #FFFAF5; color: #FF7B54; font-weight: 700; border-radius: 8px; }
     .tilt{ transition: transform .2s ease, box-shadow .2s ease; }
     .tilt:hover{ transform: translateY(-2px) rotate(.2deg); box-shadow: 0 18px 40px rgba(255,159,128,.25); }
@@ -263,9 +262,11 @@
             navBubble.style.opacity = '1';
         }
         
+        // 페이지 로드 시 '서비스 소개'를 기본 활성 상태로 설정
         const defaultActiveItem = navItems[0];
         if (defaultActiveItem) {
             defaultActiveItem.classList.add('is-active');
+            // DOM이 완전히 렌더링된 후 버블 위치 계산
             setTimeout(() => moveBubble(defaultActiveItem), 50);
         }
 
