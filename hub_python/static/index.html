@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KBU hub | 홈</title>
+  
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { peach: '#FFC8B2', peachDeep: '#FF9F80', cream: '#FFF7F2', cocoa:'#6B7280', ink:'#1F2937', mint:'#B7F4E6', lemon:'#FFF3A3' },
+          boxShadow: { soft:'0 10px 30px rgba(255,159,128,.18)', glow:'0 0 0 0 rgba(255,159,128,.0)', card:'0 10px 24px rgba(17,24,39,.08)' },
+          borderRadius: { bubble:'999px', xl2:'1.25rem' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* --- 기본 & 공통 스타일 --- */
+    html, body { 
+        font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; 
+    }
+    .top-grad { 
+        background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); 
+    }
+    
+    /* ✅ [수정됨] 헤더가 내용을 가리는 문제 해결 */
+    body {
+        padding-top: 80px; /* 헤더 높이만큼 본문 시작 위치를 내림 */
+    }
+    header {
+        position: fixed; /* 헤더를 화면 상단에 고정 */
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        background: rgba(25

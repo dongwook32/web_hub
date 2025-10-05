@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KBU hub | {% block title %}{% endblock %}</title>
+    
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { /* (tailwind config는 이전과 동일) */ }
+    </script>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block head %}{% endblock %}
+
+    <style>
+      /* ✅ [수정됨] 헤더가 콘텐츠를 가리는 문제 해결 */
+      body {
+        /* layout.css의 헤더 높이(80px)만큼 콘텐츠 시작 위치를 내림 */
+        padding-top: 80px; 
+      }
+    </style>
+</head>
+<body class="bg-cream text-ink">
+  <div class="app-background"></div>
+  <div class="app-layout">
+    <header class="app-header">
+      <div class="max-w-6xl mx-auto px-4 flex items-center h-full">
+        <a href="{{ url_for('main_page') }}" class="flex items-center gap-2 font-extrabold text-lg">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="KBU hub" class="w-9 h-9 rounded-full">
+          <span>hub</span>
+        </a>
+        <nav class="ml-auto hidden md:flex">
+          <div class="nav-pill">
+              <a class="nav-item {% if active_page == 'home' %}is-active{% endif %}" href="{{ url_for('main_page') }}">서비스 소개</a>
+              <a class="nav-item {% if active_page == 'chat' %}is-active{% endif %}" href="{{ url_for('chat_page') }}">랜덤 매칭</a>
+              <a class="nav-item {% if active_page == 'boards' %}is-active{% endif %}" href="{{ url_for('boards_page') }}">게시판</a>
+              <a class="nav-item {% if active_page == 'mypage' %}is-active{% endif %}" href="{{ url_for('mypage_page') }}">마이페이지</a>
+              {% if nickname %}
+                <a href="{{ url_for('logout') }}" class="nav-item">로그아웃</a>
+              {% else %}
+                <a href="{{ url_for('login_page') }}" class="nav-item">로그인</a>
+              {% endif %}
+          </div>
+        </nav>
+        <button id="menuBtn" class="md-hidden ml-auto p-2 rounded-full border border-peach/60">☰</button>
+      </div>
+    </header>
+
+    <main id="main-content" class="app-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+      <div>© <span id="year"></span> KBU hub · All rights reserved.</div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
