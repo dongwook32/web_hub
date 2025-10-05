@@ -28,46 +28,45 @@
     .top-grad{ background: radial-gradient(60% 60% at 0% 0%, #FFF0E7 0%, rgba(255,240,231,0) 60%), radial-gradient(60% 60% at 100% 0%, #FFE7DB 0%, rgba(255,231,219,0) 60%); }
     .glass{ background: rgba(255,255,255,.7); backdrop-filter: blur(10px); }
     
-    /* ✅ [수정됨] 최종 클릭 버블 기능 스타일 */
     .nav-container {
-        position: relative; /* 버블의 기준점 */
+        position: relative;
         display: flex;
         gap: 6px;
         padding: 6px;
     }
     .nav-item {
         position: relative;
-        z-index: 1; /* 버블보다 위에 있도록 */
+        z-index: 1;
         padding: 10px 16px;
         border-radius: 999px;
         font-weight: 700;
-        color: #374151; /* 평소 글자색: 검은색 */
+        color: #374151;
         transition: color .3s ease;
         background: none;
         border: none;
         cursor: pointer;
+        white-space: nowrap;
     }
     .nav-item.is-active {
-        color: white; /* 활성화된 메뉴만 글자색 흰색 */
+        color: white;
     }
     .nav-bubble {
         position: absolute;
         z-index: 0;
         top: 6px;
-        left: 0; /* JS가 위치를 계산하므로 초기값은 0 */
+        left: 0;
+        height: calc(100% - 12px);
         background: linear-gradient(135deg, #FF9F80, #FFC8B2);
         border-radius: 999px;
         box-shadow: 0 4px 15px rgba(255, 159, 128, 0.3);
         transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                    width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
-                    opacity 0.2s ease;
-        opacity: 0; /* 평소에는 숨김 */
+                    width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        opacity: 0;
     }
     .nav-bubble.is-visible {
-        opacity: 1; /* JS가 이 클래스를 추가하면 보임 */
+        opacity: 1;
     }
 
-    /* (이하 다른 스타일은 이전과 동일) */
     .py-2.active { background: #FFFAF5; color: #FF7B54; font-weight: 700; border-radius: 8px; }
     .tilt{ transition: transform .2s ease, box-shadow .2s ease; }
     .tilt:hover{ transform: translateY(-2px) rotate(.2deg); box-shadow: 0 18px 40px rgba(255,159,128,.25); }
@@ -254,36 +253,39 @@
       const navContainer = document.getElementById('navContainer');
       if (navContainer) {
         const navBubble = document.getElementById('navBubble');
-        const navItems = navContainer.querySelectorAll('.nav-item');
+        const navItems = Array.from(navContainer.querySelectorAll('.nav-item')); // NodeList를 Array로 변환
 
         function moveBubble(target) {
             if (!target) return;
-            // .nav-container 기준으로 target의 상대 위치 계산
-            const targetLeft = target.offsetLeft;
-            const targetWidth = target.offsetWidth;
+            
+            // getBoundingClientRect를 사용하여 더 정확한 위치 계산
+            const targetRect = target.getBoundingClientRect();
+            const containerRect = navContainer.getBoundingClientRect();
+            const left = targetRect.left - containerRect.left;
 
-            navBubble.style.width = `${targetWidth}px`;
-            navBubble.style.transform = `translateX(${targetLeft}px)`;
-            // CSS 클래스를 추가하여 보이게 함
+            navBubble.style.width = `${targetRect.width}px`;
+            navBubble.style.transform = `translateX(${left}px)`;
             navBubble.classList.add('is-visible');
         }
         
-        // 페이지 로드 시 '서비스 소개'(첫 번째 아이템)를 기본 활성 상태로 설정
+        // 페이지 로드 시 '서비스 소개'를 기본 활성 상태로 설정
         const defaultActiveItem = navItems[0];
         if (defaultActiveItem) {
             defaultActiveItem.classList.add('is-active');
-            // 페이지가 완전히 그려진 후 버블 위치를 계산하고 보여주기 위해 setTimeout 사용
+            // 페이지가 완전히 그려진 후 버블 위치 계산 (setTimeout으로 약간의 지연을 줌)
             setTimeout(() => moveBubble(defaultActiveItem), 100);
         }
 
         navItems.forEach(item => {
             item.addEventListener('click', function(event) {
-                // 로그인/로그아웃 버튼이 아닌 경우에만 is-active 클래스 관리
-                if (this.tagName === 'A') {
-                    navItems.forEach(i => i.classList.remove('is-active'));
-                    this.classList.add('is-active');
-                    moveBubble(this);
+                // 로그인/로그아웃 버튼은 페이지 이동만 하고, is-active 상태는 변경하지 않음
+                if (this.tagName === 'BUTTON') {
+                    return;
                 }
+                
+                navItems.forEach(i => i.classList.remove('is-active'));
+                this.classList.add('is-active');
+                moveBubble(this);
             });
         });
       }
