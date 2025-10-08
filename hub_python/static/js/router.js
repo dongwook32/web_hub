@@ -1,139 +1,76 @@
 /**
- * KBU Hub SPA 라우터 시스템
- * 페이지 전환 시 깜박임(FOUC/FOUT/CLS) 제거를 위한 클라이언트 사이드 라uting
+ * KBU Hub SPA 라우터 시스템 V2 (더 간단하고 효율적인 버전)
  */
+document.addEventListener('DOMContentLoaded', () => {
 
-class SPARouter {
-    constructor() {
-        this.routes = {
-            // ✅ 경로 수정: 모든 HTML 파일은 /static/ 폴더 안에 있으므로, 경로에 /static/을 추가합니다.
-            '/': '/static/index.html',
-            '/index': '/static/index.html',
-            '/chat': '/static/chat.html',
-            '/boards': '/static/boards.html',
-            '/mypage': '/static/mypage.html',
-            '/login': '/static/login.html',
-            '/signup': '/static/signup.html', // 회원가입 경로 추가
-            '/profile-setup': '/static/profile-setup.html',
-            '/certify': '/static/certify.html', // 약관동의 경로 추가
-            '/email-signup': '/static/email_signup.html' // 이메일 인증 경로 추가
-        };
-        
-        this.currentRoute = '/';
-        this.currentFile = '/static/index.html';
-        this.contentContainer = null;
-        this.isNavigating = false;
-        
-        this.init();
-    }
-    
-    init() {
-        // 콘텐츠 컨테이너 설정
-        this.contentContainer = document.getElementById('main-content');
-        if (!this.contentContainer) {
-            console.error('❌ main-content 컨테이너를 찾을 수 없습니다.');
+    // 1. 라우트 정의: URL 경로와 불러올 HTML 파일 이름을 짝지어줍니다.
+    // 이제 파일 경로는 훨씬 더 깔끔해집니다.
+    const routes = {
+        '/': 'index.html',
+        '/login': 'login.html',
+        '/boards': 'boards.html',
+        '/chat': 'chat.html',
+        '/mypage': 'mypage.html',
+        '/signup': 'signup.html',
+        '/profile-setup': 'profile-setup.html',
+        '/certify': 'certify.html',
+        '/email-signup': 'email_signup.html',
+        // 404 페이지를 만들어두면 좋습니다.
+        '/404': '404.html' 
+    };
+
+    // 2. 메인 콘텐츠를 표시할 DOM 요소를 찾습니다.
+    const mainContent = document.getElementById('main-content');
+
+    // 3. 페이지 콘텐츠를 불러오고 화면에 표시하는 핵심 함수
+    const loadContent = async (path) => {
+        // 현재 경로에 맞는 파일 이름을 찾습니다. 없으면 404.html을 사용합니다.
+        const targetFile = routes[path] || routes['/404'];
+        if (!targetFile) {
+            mainContent.innerHTML = '<h2>페이지를 찾을 수 없습니다.</h2>';
             return;
         }
-        
-        // 초기 라우트 설정
-        this.currentRoute = window.location.pathname || '/';
-        
-        // 네비게이션 이벤트 리스너 설정
-        this.setupNavigationListeners();
-        
-        // 브라우저 히스토리 이벤트 리스너 설정
-        window.addEventListener('popstate', (e) => {
-            this.handleRouteChange(e.state?.route || window.location.pathname, false);
-        });
-        
-        // 초기 페이지 로드
-        this.handleRouteChange(this.currentRoute, false);
-        
-        console.log('🚀 SPA 라우터 초기화 완료');
-    }
-
-    setupNavigationListeners() {
-        document.body.addEventListener('click', e => {
-            // data-spa-link 속성을 가진 링크만 라우터가 처리하도록 개선
-            const link = e.target.closest('a[href]');
-
-            if (link && link.getAttribute('href').startsWith('/')) {
-                // 외부 링크나 #으로 시작하는 링크는 무시
-                if (link.hostname && link.hostname !== window.location.hostname) return;
-                
-                e.preventDefault();
-                const route = link.getAttribute('href');
-                this.navigateTo(route);
-            }
-        });
-    }
-
-    async navigateTo(route) {
-        if (this.isNavigating) return;
-        this.handleRouteChange(route, true);
-    }
-    
-    async handleRouteChange(route, isPushState) {
-        if (!this.routes[route]) {
-            console.warn(`'${route}'에 해당하는 라우트를 찾을 수 없습니다. 홈으로 이동합니다.`);
-            route = '/';
-        }
-
-        this.isNavigating = true;
-        this.currentRoute = route;
-        this.currentFile = this.routes[route];
-
-        if (isPushState) {
-            history.pushState({ route }, '', route);
-        }
-        
-        this.contentContainer.classList.add('fade-out-start');
-        await this.wait(150);
 
         try {
-            // ✅ 수정된 경로로 HTML 콘텐츠를 fetch 합니다.
-            const response = await fetch(this.currentFile);
-            if (!response.ok) {
-                throw new Error(`${this.currentFile} 파일을 불러올 수 없습니다.`);
-            }
-            const html = await response.text();
+            // ✅ 핵심 수정: "static/pages/" 폴더에서 해당 HTML 파일을 fetch로 불러옵니다.
+            const response = await fetch(`/static/pages/${targetFile}`);
+            if (!response.ok) throw new Error('페이지 로딩 실패');
             
-            this.contentContainer.innerHTML = html;
+            const html = await response.text();
+            mainContent.innerHTML = html;
 
-            // 삽입된 HTML 내의 <script> 태그를 찾아서 실행시켜줌
-            this.contentContainer.querySelectorAll('script').forEach(oldScript => {
-                const newScript = document.createElement('script');
-                Array.from(oldScript.attributes).forEach(attr => {
-                    newScript.setAttribute(attr.name, attr.value);
-                });
+            // 불러온 HTML 조각 안에 있는 <script> 태그를 찾아서 실행시켜주는 코드
+            // 이렇게 해야 각 페이지의 전용 스크립트(로그인, 게시판 기능 등)가 작동합니다.
+            Array.from(mainContent.querySelectorAll("script")).forEach(oldScript => {
+                const newScript = document.createElement("script");
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
                 newScript.appendChild(document.createTextNode(oldScript.innerHTML));
                 oldScript.parentNode.replaceChild(newScript, oldScript);
             });
+            console.log(`✅ ${path} 페이지 로딩 및 스크립트 실행 완료.`);
 
         } catch (error) {
-            console.error('페이지 로드 오류:', error);
-            this.contentContainer.innerHTML = '<p class="text-center text-red-500">페이지를 불러오는 데 실패했습니다.</p>';
+            console.error(`${path} 페이지 로딩 중 오류:`, error);
+            mainContent.innerHTML = '<h2>페이지를 불러오는 중 오류가 발생했습니다.</h2>';
         }
+    };
 
-        this.contentContainer.classList.remove('fade-out-start');
-        this.isNavigating = false;
+    // 4. 다른 파일에서 window.spaRouter.navigateTo('/경로') 형태로 호출할 수 있는 함수
+    window.spaRouter = {
+        navigateTo: (path) => {
+            // 브라우저 주소창의 주소를 변경하고, 히스토리에 기록을 남깁니다.
+            history.pushState(null, null, path);
+            // 해당 경로의 콘텐츠를 불러옵니다.
+            loadContent(path);
+        }
+    };
 
-        window.scrollTo(0, 0);
-        
-        window.dispatchEvent(new CustomEvent('pageLoaded', { 
-            detail: { route: this.currentRoute, file: this.currentFile } 
-        }));
-    }
-    
-    wait(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    // 공개 메서드
-    getCurrentRoute() {
-        return this.currentRoute;
-    }
-}
+    // 5. 브라우저의 뒤로가기/앞으로가기 버튼을 처리합니다.
+    window.addEventListener('popstate', () => {
+        loadContent(location.pathname);
+    });
 
-// 전역 라우터 인스턴스 생성
-window.spaRouter = new SPARouter();
+    // 6. 페이지가 처음 로드될 때 현재 주소에 맞는 콘텐츠를 불러옵니다.
+    loadContent(location.pathname);
+
+});

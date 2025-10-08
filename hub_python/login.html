@@ -26,87 +26,75 @@
     <!-- 이 부분은 SPA의 app.html에서 관리하므로, 로그인 페이지에서는 헤더를 포함하지 않습니다. -->
     <!-- 다만, 단독으로 실행될 경우를 대비해 남겨둘 수는 있습니다. -->
 
-    <main class="flex-grow flex items-center justify-center p-4">
-        <form id="login-form" class="w-full max-w-sm bg-white p-8 rounded-xl2 shadow-card">
-            <h1 class="text-3xl font-bold text-center mb-2">KBU hub</h1>
-            <p class="text-center text-cocoa mb-8">로그인하고 커뮤니티에 참여하세요!</p>
-            
-            <!-- ✨ 서버 오류 메시지를 표시할 공간 -->
-            <div id="error-message" class="text-red-500 text-center text-sm mb-4 h-5"></div>
-
-            <div class="mb-4">
-                <label for="studentId" class="block text-sm font-semibold mb-2">학번</label>
-                <input type="text" id="studentId" name="studentId" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peachDeep/50 transition">
-            </div>
-            
-            <div class="mb-6">
-                <label for="password" class="block text-sm font-semibold mb-2">비밀번호</label>
-                <input type="password" id="password" name="password" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peachDeep/50 transition">
-            </div>
-            
-            <button type="submit" class="w-full bg-peachDeep text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition transform hover:-translate-y-0.5">
-                로그인
-            </button>
-            
-            <div class="mt-6 text-center">
-                <a href="#" onclick="window.spaRouter.navigateTo('/signup')" class="text-sm text-peachDeep hover:underline" style="color:var(--primary-color); font-weight:600;">아직 계정이 없나요? 회원가입</a>
-            </div>
-        </form>
-    </main>
-    
-    <!-- ============================================================================== -->
-    <!-- ✨✨✨ 서버와 실제 통신하도록 변경된 스크립트 ✨✨✨ -->
-    <!-- ============================================================================== -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const loginForm = document.getElementById('login-form');
-        const errorMessageDiv = document.getElementById('error-message');
+<main class="flex-grow flex items-center justify-center p-4">
+    <form id="login-form" class="w-full max-w-sm bg-white p-8 rounded-xl2 shadow-card">
+        <h1 class="text-3xl font-bold text-center mb-2">KBU hub</h1>
+        <p class="text-center text-cocoa mb-8">로그인하고 커뮤니티에 참여하세요!</p>
         
-        loginForm.addEventListener('submit', async function(e){ // async 키워드 추가
-            e.preventDefault();
-            
-            const studentId = document.getElementById('studentId').value;
-            const password = document.getElementById('password').value;
-            errorMessageDiv.textContent = ''; // 이전 오류 메시지 초기화
+        <div id="error-message" class="text-red-500 text-center text-sm mb-4 h-5"></div>
 
-            try {
-                // 1. fetch API를 사용해 백엔드('/api/login')로 데이터를 보냅니다.
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    // 2. 입력된 학번과 비밀번호를 JSON 형태로 변환하여 전송합니다.
-                    body: JSON.stringify({
-                        studentId: studentId,
-                        password: password
-                    })
-                });
+        <div class="mb-4">
+            <label for="studentId" class="block text-sm font-semibold mb-2">학번</label>
+            <input type="text" id="studentId" name="studentId" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peachDeep/50 transition">
+        </div>
+        
+        <div class="mb-6">
+            <label for="password" class="block text-sm font-semibold mb-2">비밀번호</label>
+            <input type="password" id="password" name="password" required class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peachDeep/50 transition">
+        </div>
+        
+        <button type="submit" class="w-full bg-peachDeep text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition transform hover:-translate-y-0.5">
+            로그인
+        </button>
+        
+        <div class="mt-6 text-center">
+            <a href="#" onclick="window.spaRouter.navigateTo('/signup')" class="text-sm text-peachDeep hover:underline" style="color:var(--primary-color); font-weight:600;">아직 계정이 없나요? 회원가입</a>
+        </div>
+    </form>
+</main>
+    
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const loginForm = document.getElementById('login-form');
+    const errorMessageDiv = document.getElementById('error-message');
+    
+    if (loginForm) { // form이 존재할 때만 이벤트 리스너를 추가합니다.
+      loginForm.addEventListener('submit', async function(e){
+          e.preventDefault();
+          
+          const studentId = document.getElementById('studentId').value;
+          const password = document.getElementById('password').value;
+          errorMessageDiv.textContent = '';
 
-                // 3. 서버로부터 받은 응답을 JSON으로 파싱합니다.
-                const data = await response.json();
+          try {
+              const response = await fetch('/api/login', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      studentId: studentId,
+                      password: password
+                  })
+              });
 
-                // 4. 응답 상태를 확인합니다. (성공: 200, 실패: 401 등)
-                if (response.ok) { // HTTP 상태 코드가 200-299 사이인 경우
-                    alert(data.message); // "로그인 성공!" 메시지 표시
-                    
-                    // 이제 서버가 세션을 관리하므로 localStorage는 필요 없습니다.
-                    
-                    // 5. SPA 라우터를 사용해 게시판 페이지로 이동시킵니다.
-                    window.spaRouter.navigateTo('/boards');
+              const data = await response.json();
 
-                } else {
-                    // 로그인 실패 시, 서버가 보낸 오류 메시지를 화면에 표시합니다.
-                    errorMessageDiv.textContent = data.error || '로그인에 실패했습니다.';
-                }
+              if (response.ok) {
+                  alert(data.message);
+                  window.location.hash = '/boards'; // SPA 라우터 대신 페이지를 새로고침하여 상태를 확실히 반영
+                  window.location.reload();
+              } else {
+                  errorMessageDiv.textContent = data.error || '로그인에 실패했습니다.';
+              }
 
-            } catch (error) {
-                // 네트워크 문제 등 fetch 자체에서 오류가 발생한 경우
-                console.error('Login Error:', error);
-                errorMessageDiv.textContent = '서버와 통신할 수 없습니다.';
-            }
-        });
-    });
-    </script>
+          } catch (error) {
+              console.error('Login Error:', error);
+              errorMessageDiv.textContent = '서버와 통신할 수 없습니다.';
+          }
+      });
+    }
+});
+</script>
 </body>
 </html>
