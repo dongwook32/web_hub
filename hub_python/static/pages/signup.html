@@ -1,208 +1,42 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBU Hub 회원가입 - 정보 입력</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background-color: #f4f7f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #333;
-        }
-        .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 500px;
-            padding: 40px;
-            text-align: center;
-        }
-        h1 { font-size: 24px; margin-bottom: 10px; }
-        p { font-size: 16px; color: #666; margin-bottom: 30px; }
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-        #signup-btn {
-            background-color: #4e54c8;
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        #result-message { margin-top: 20px; font-weight: bold; height: 20px; }
+<main class="flex-grow flex items-center justify-center p-4">
+    <form id="signup-form" class="w-full max-w-lg bg-white p-8 rounded-xl2 shadow-card">
+        <h1 class="text-3xl font-bold text-center mb-6">KBU Hub 회원가입</h1>
+        
+        <div id="signup-error-message" class="text-red-500 text-center text-sm mb-4 h-5"></div>
 
-        /* ✅ [추가됨] 비밀번호 보기 기능을 위한 스타일 */
-        .password-wrapper {
-            position: relative;
-            width: 100%;
-        }
-        .password-wrapper input {
-            padding-right: 45px; /* 아이콘이 들어갈 공간 확보 */
-        }
-        .toggle-password {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>회원정보 입력</h1>
-        <p><strong>{{ user_email }}</strong><br>계정으로 가입을 진행합니다.</p>
-
-        <input type="hidden" id="verification-token" value="{{ token }}">
-
-        <div class="form-group">
-            <label for="student-id">학번</label>
-            <input type="text" id="student-id" placeholder="학번을 입력하세요">
-        </div>
-        <div class="form-group">
-            <label for="name">이름</label>
-            <input type="text" id="name" placeholder="실명을 입력하세요">
-        </div>
-        <div class="form-group">
-            <label for="birthdate">생년월일</label>
-            <input type="date" id="birthdate">
-        </div>
-        <div class="form-group">
-            <label for="status">재학 상태</label>
-            <select id="status">
-                <option value="">선택하세요</option>
-                <option value="신입생">신입생</option>
-                <option value="재학생">재학생</option>
-                <option value="편입생">편입생</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="password">비밀번호</label>
-            <div class="password-wrapper">
-                <input type="password" id="password" placeholder="비밀번호">
-                <span class="toggle-password" id="toggle-password">👁️</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" required>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="password-confirm">비밀번호 확인</label>
-            <div class="password-wrapper">
-                <input type="password" id="password-confirm" placeholder="비밀번호를 한번 더 입력하세요">
-                <span class="toggle-password" id="toggle-password-confirm">👁️</span>
+            <div class="form-group">
+                <label for="nickname">닉네임</label>
+                <input type="text" id="nickname" required>
+            </div>
+            <div class="form-group">
+                <label for="studentId">학번</label>
+                <input type="text" id="studentId" required>
+            </div>
+             <div class="form-group">
+                <label for="email">학교 이메일</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group">
+                <label for="passwordConfirm">비밀번호 확인</label>
+                <input type="password" id="passwordConfirm" required>
             </div>
         </div>
         
-        <p id="result-message"></p>
-        <button id="signup-btn">가입 완료</button>
-    </div>
-
-    <script>
-        const signupBtn = document.getElementById('signup-btn');
-        const studentIdInput = document.getElementById('student-id');
-        const nameInput = document.getElementById('name');
-        const birthdateInput = document.getElementById('birthdate');
-        const statusInput = document.getElementById('status');
-        const passwordInput = document.getElementById('password');
-        const passwordConfirmInput = document.getElementById('password-confirm');
-        const tokenInput = document.getElementById('verification-token');
-        const resultMessage = document.getElementById('result-message');
-
-        // ✅ [추가됨] 비밀번호 보기 아이콘 요소 가져오기
-        const togglePassword = document.getElementById('toggle-password');
-        const togglePasswordConfirm = document.getElementById('toggle-password-confirm');
-
-        // ✅ [추가됨] 첫 번째 비밀번호 아이콘 클릭 이벤트
-        togglePassword.addEventListener('click', function () {
-            // 입력창의 type을 password와 text 사이에서 전환
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            // 아이콘 모양 변경
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-
-        // ✅ [추가됨] 두 번째 비밀번호 확인 아이콘 클릭 이벤트
-        togglePasswordConfirm.addEventListener('click', function () {
-            const type = passwordConfirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordConfirmInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-
-
-        // (가입 완료 버튼 클릭 이벤트는 이전과 동일)
-        signupBtn.addEventListener('click', function() {
-            // ... (이전과 동일한 코드) ...
-            const studentId = studentIdInput.value;
-            const name = nameInput.value;
-            const birthdate = birthdateInput.value;
-            const status = statusInput.value;
-            const password = passwordInput.value;
-            const passwordConfirm = passwordConfirmInput.value;
-            const token = tokenInput.value;
-
-            if (password !== passwordConfirm) {
-                resultMessage.textContent = '오류: 비밀번호가 일치하지 않습니다.';
-                resultMessage.style.color = 'red';
-                return;
-            }
-
-            if (!studentId || !name || !birthdate || !status || !password) {
-                resultMessage.textContent = '오류: 모든 항목을 입력해주세요.';
-                resultMessage.style.color = 'red';
-                return;
-            }
-
-            fetch("{{ url_for('signup') }}", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    name: name,
-                    birthdate: birthdate,
-                    status: status,
-                    password: password,
-                    token: token
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    resultMessage.textContent = data.message;
-                    resultMessage.style.color = 'blue';
-                    alert(data.message);
-                    setTimeout(() => {
-                        window.location.href = "{{ url_for('login_page') }}";
-                    }, 1000);
-                } else {
-                    resultMessage.textContent = '오류: ' + data.error;
-                    resultMessage.style.color = 'red';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultMessage.textContent = '서버 통신 오류가 발생했습니다.';
-                resultMessage.style.color = 'red';
-            });
-        });
-    </script>
-</body>
-</html>
+        <button type="submit" class="w-full mt-6 bg-peachDeep text-white font-bold py-3 rounded-lg hover:bg-opacity-90 transition">
+            회원가입
+        </button>
+        
+        <div class="mt-6 text-center">
+            <a href="/login" onclick="event.preventDefault(); window.spaRouter.navigateTo('/login')" class="text-sm text-peachDeep hover:underline">이미 계정이 있나요? 로그인</a>
+        </div>
+    </form>
+</main>

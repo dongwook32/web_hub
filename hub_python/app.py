@@ -131,6 +131,40 @@ def login():
     else:
         return jsonify({"success": False, "error": "학번 또는 비밀번호가 일치하지 않습니다."}), 401
 
+@app.route('/api/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    student_id = data.get('studentId')
+    password = data.get('password')
+    name = data.get('name')
+    nickname = data.get('nickname')
+    email = data.get('email')
+
+    # 필수 정보 확인
+    if not all([student_id, password, name, nickname, email]):
+        return jsonify({"error": "모든 필드를 입력해주세요."}), 400
+
+    # 사용자 중복 확인
+    if User.query.filter((User.student_id == student_id) | (User.email == email) | (User.nickname == nickname)).first():
+        return jsonify({"error": "이미 사용 중인 학번, 이메일 또는 닉네임입니다."}), 409
+
+    # 비밀번호 암호화 (가장 중요!)
+    password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    # 새 사용자 생성 및 데이터베이스에 저장
+    new_user = User(
+        student_id=student_id,
+        password_hash=password_hash,
+        name=name,
+        nickname=nickname,
+        email=email
+    )
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "회원가입이 성공적으로 완료되었습니다! 로그인해주세요."}), 201
+
+
 @app.route('/api/logout', methods=['POST'])
 def logout():
     session.clear()
