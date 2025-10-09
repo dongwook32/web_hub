@@ -1,94 +1,91 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KBU hub | 대학생 익명 커뮤니티</title>
-  
-  <!-- ✅ 경로 일치: logo.png는 static 폴더 바로 아래에 있으므로 그대로 둡니다. -->
-  <link rel="icon" href="/static/logo.png">
-  
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- ✅ 최종 경로 수정: CSS 파일들은 static/css/ 폴더 안에 있습니다. -->
-  <link rel="stylesheet" href="/static/css/layout.css">
-  <link rel="stylesheet" href="/static/css/nav.css">
-  <link rel="stylesheet" href="/static/css/style.css">
-
-  <script>
-    // Tailwind 설정은 그대로 둡니다.
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: { peach: '#FFC8B2', peachDeep: '#FF9F80', cream: '#FFF7F2', cocoa:'#6B7280', ink:'#1F2937', mint:'#B7F4E6', lemon:'#FFF3A3' },
-          boxShadow: { soft:'0 10px 30px rgba(255,159,128,.18)', glow:'0 0 0 0 rgba(255,159,128,.0)', card:'0 10px 24px rgba(17,24,39,.08)' },
-          borderRadius: { bubble:'999px', xl2:'1.25rem' }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KBU hub | 대학생 익명 커뮤니티</title>
+    
+    <link rel="icon" href="/static/logo.png">
+    
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="/static/css/layout.css">
+    <link rel="stylesheet" href="/static/css/nav.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        // Tailwind 설정
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { peach: '#FFC8B2', peachDeep: '#FF9F80', cream: '#FFF7F2', cocoa:'#6B7280', ink:'#1F2937', mint:'#B7F4E6', lemon:'#FFF3A3' },
+                    boxShadow: { soft:'0 10px 30px rgba(255,159,128,.18)', glow:'0 0 0 0 rgba(255,159,128,.0)', card:'0 10px 24px rgba(17,24,39,.08)' },
+                    borderRadius: { bubble:'999px', xl2:'1.25rem' }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
 </head>
 <body class="bg-cream text-ink app-layout">
-  <div class="app-background"></div>
+    <div class="app-background"></div>
 
-  <header class="app-header">
-    <div class="container mx-auto px-4 flex items-center h-full">
-      <a href="/" onclick="event.preventDefault(); window.spaRouter.navigateTo('/')" class="flex items-center gap-2">
-        <img src="/static/logo.png" alt="KBU hub 로고" class="h-8 w-8">
-        <span class="font-bold text-xl text-ink">KBU hub</span>
-      </a>
-      <nav class="ml-auto hidden md:flex">
-        <div class="nav-pill" id="main-nav-links">
-            <!-- 네비게이션 링크들은 navigation.js가 동적으로 관리할 수 있습니다. -->
+    <header class="app-header">
+        <div class="container mx-auto px-4 flex items-center h-full">
+            <a href="/" onclick="event.preventDefault(); window.spaRouter.navigateTo('/')" class="flex items-center gap-2">
+                <img src="/static/logo.png" alt="KBU hub 로고" class="h-8 w-8">
+                <span class="font-bold text-xl text-ink">KBU hub</span>
+            </a>
+            <nav class="ml-auto hidden md:flex">
+                <div class="nav-pill" id="main-nav-links">
+                    </div>
+                <div id="auth-nav-links" class="nav-pill">
+                    <a class="nav-item" href="/login" onclick="event.preventDefault(); window.spaRouter.navigateTo('/login')">로그인</a>
+                </div>
+            </nav>
+            <button id="menuBtn" class="md:hidden ml-auto p-2 rounded-full">☰</button>
         </div>
-        <div id="auth-nav-links" class="nav-pill">
-          <a class="nav-item" href="/login" onclick="event.preventDefault(); window.spaRouter.navigateTo('/login')">로그인</a>
-        </div>
-      </nav>
-      <button id="menuBtn" class="md:hidden ml-auto p-2 rounded-full">☰</button>
-    </div>
-  </header>
-  
-  <main id="main-content" class="app-content container mx-auto px-4 py-8">
-    <!-- 로딩 중... -->
-  </main>
+    </header>
+    
+    <main id="main-content" class="app-content container mx-auto px-4 py-8">
+        </main>
 
-  <footer class="app-footer text-center p-4 text-cocoa text-sm">
-    <div>© <span id="year"></span> KBU hub · All rights reserved.</div>
-  </footer>
+    <footer class="app-footer text-center p-4 text-cocoa text-sm">
+        <div>© <span id="year"></span> KBU hub · All rights reserved.</div>
+    </footer>
 
-  <!-- ✅ 최종 경로 수정: JS 파일들은 static/js/ 폴더 안에 있습니다. -->
-  <script src="/static/js/preload.js"></script>
-  <script src="/static/js/router.js"></script>
-  <script src="/static/js/navigation.js"></script>
-  <script src="/static/js/script.js"></script>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('year').textContent = new Date().getFullYear();
-      console.log('🎉 앱 초기화 완료');
-      
-      // 로그인 상태를 확인하여 네비게이션 메뉴를 동적으로 업데이트합니다.
-      fetch('/api/auth/status')
-        .then(response => response.json())
-        .then(data => {
-          const authNavLinks = document.getElementById('auth-nav-links');
-          if (data.isLoggedIn) {
-            authNavLinks.innerHTML = `
-              <span class="nav-item !bg-transparent">환영합니다, ${data.user.nickname}님!</span>
-              <a href="#" id="logout-button" class="nav-item">로그아웃</a>
-            `;
-            document.getElementById('logout-button').addEventListener('click', (e) => {
-              e.preventDefault();
-              fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
-            });
-          }
+    <script src="/static/js/preload.js"></script>
+    <script src="/static/js/router.js"></script>
+    <script src="/static/js/navigation.js"></script>
+    <script src="/static/js/script.js"></script>
+    
+    <script src="/static/js/boards.js"></script>
+    <script src="/static/js/chat.js"></script>
+    
+    <script>
+        // 이 스크립트는 app.html 자체에만 필요한 간단한 기능들입니다.
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            console.log('🎉 앱 초기화 완료');
+            
+            // 로그인 상태 확인 및 네비게이션 업데이트
+            fetch('/api/auth/status')
+                .then(response => response.json())
+                .then(data => {
+                    const authNavLinks = document.getElementById('auth-nav-links');
+                    if (data.isLoggedIn && authNavLinks) {
+                        authNavLinks.innerHTML = `
+                            <span class="nav-item !bg-transparent">환영합니다, ${data.user.nickname}님!</span>
+                            <a href="#" id="logout-button" class="nav-item">로그아웃</a>
+                        `;
+                        document.getElementById('logout-button').addEventListener('click', (e) => {
+                            e.preventDefault();
+                            fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
+                        });
+                    }
+                });
         });
-    });
-  </script>
+    </script>
 </body>
 </html>
-

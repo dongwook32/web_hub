@@ -115,6 +115,7 @@ def auth_status():
         if user:
             return jsonify({"isLoggedIn": True, "user": user.to_dict()}), 200
     return jsonify({"isLoggedIn": False}), 200
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -129,23 +130,55 @@ def login():
         return jsonify({"success": True, "message": "로그인 성공!", "user": user.to_dict()}), 200
     else:
         return jsonify({"success": False, "error": "학번 또는 비밀번호가 일치하지 않습니다."}), 401
+
 @app.route('/api/logout', methods=['POST'])
 def logout():
     session.clear()
     return jsonify({"message": "성공적으로 로그아웃되었습니다."}), 200
+
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     posts = Post.query.order_by(Post.created_at.desc()).all()
     posts_list = [post.to_dict() for post in posts]
     return jsonify(posts=posts_list), 200
 
+# =========================================================================
+# ✅ [수정됨] 회원가입 및 이메일 인증을 위한 라우트 추가
+# =========================================================================
+@app.route('/signup-email')
+def signup_email_page():
+    return render_template('email_signup.html')
+
+@app.route('/start-verification', methods=['POST'])
+def start_verification():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email or not email.endswith('@bible.ac.kr'):
+        return jsonify({"error": "올바른 학교 이메일 주소를 입력하세요."}), 400
+    
+    # 실제 이메일 발송 로직 (추후 구현)
+    print(f"인증 메일 발송 시도: {email}") 
+
+    return jsonify({"message": f"{email}로 인증 메일이 발송되었습니다. 메일을 확인해주세요."}), 200
+# =========================================================================
+
 # --- 4. SPA를 위한 통합 라우트 (Catch-all Route) ---
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
+    # API 요청은 SPA 라우팅에서 제외
     if path.startswith('api/'):
         return jsonify({"error": "존재하지 않는 API 엔드포인트입니다."}), 404
-    return render_template("app.html")
+    
+    # ✅ [추가됨] 독립적인 페이지들(회원가입 등)은 SPA 라우팅에서 제외
+    if path in ['signup-email']: # 여기에 다른 독립 페이지 경로도 추가 가능
+        # 해당 경로를 처리하는 함수가 이미 위에 있으므로, Flask가 알아서 처리함
+        # 이 return을 그냥 지나치게 해서 Flask의 기본 동작을 따르게 함
+        pass
+    else:
+        # 그 외 모든 경로는 SPA의 진입점인 app.html을 렌더링
+        return render_template("app.html")
 
 # --- 5. 서버 실행 ---
 if __name__ == '__main__':
